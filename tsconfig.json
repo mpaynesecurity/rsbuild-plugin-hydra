@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		"lib": [
+			"DOM",
+			"ES2020"
+		],
+		"jsx": "preserve",
+		"target": "esnext",
+		"module": "esnext",
+
+		"noEmit": true,
+		"skipLibCheck": true,
+		"types": [
+			"@rsbuild/core/types",
+			"node",
+			"bun-types"
+		],
+		"jsxImportSource": "solid-js",
+		"useDefineForClassFields": true,
+		/* modules */
+		"moduleDetection": "force",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"resolveJsonModule": true,
+		"allowImportingTsExtensions": true,
+		/* type checking */
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	}
+}

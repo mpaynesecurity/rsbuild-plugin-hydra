@@ -1,0 +1,16 @@
+{
+	"type": "module",
+	"scripts": {
+		"build:lib": "bunx rslib"
+	},
+	"exports": {
+		"./node": {
+			"types": "./dist/node/index.d.ts",
+			"import": "./dist/node/index.js"
+		},
+		"./universal": {
+			"types": "./dist/universal/index.d.ts",
+			"import": "./dist/universal/index.js"
+		}
+	}
+}

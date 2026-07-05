@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"isolatedModules": true,
+		"resolveJsonModule": true
+	},
+	"extends": ["../tsconfig.json"],
+	"include": [
+		"universal-server", "./rslib.config.ts", "node-server"]
+}

@@ -1,0 +1,38 @@
+{
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "bunx --bun rsbuild build",
+		"dev": "rsbuild",
+		"preview": "rsbuild preview",
+		"test": "rstest",
+		"test:watch": "rstest --watch",
+		"preview:cf": "wrangler dev dist/index.mjs",
+		"preview:bun": "bun dist/index.mjs"
+	},
+	"dependencies": {
+		"@hono/node-server": "^2.0.8",
+		"@solidjs/router": "^0.16.1",
+		"hono": "^4.12.27",
+		"solid-js": "^1.9.13"
+	},
+	"devDependencies": {
+		"@rsbuild/core": "^2.1.4",
+		"@rsbuild/plugin-babel": "^2.0.1",
+		"@rsbuild/plugin-solid": "^1.2.2",
+		"@rsbuild/plugin-tailwindcss": "^2.0.3",
+		"@rslib/core": "^0.23.2",
+		"@rstest/adapter-rsbuild": "^0.10.6",
+		"@rstest/core": "^0.10.6",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@types/bun": "^1.3.14",
+		"@types/node": "^24.13.2",
+		"happy-dom": "^20.10.6",
+		"tailwindcss": "^4.3.1",
+		"typescript": "^6.0.3",
+		"wrangler": "^4.107.0"
+	},
+	"peerDependencies": {}
+}
