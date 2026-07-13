@@ -1,13 +1,14 @@
 import { defineConfig } from "@rslib/core"
-import pkg from "../package.json" with { type: "json" }
+import pkg from "./package.json" with { type: "json" }
 
 export default defineConfig({
 	lib: [
 		{
 			format: "esm",
 			syntax: "es2024",
-			bundle: true,
-			dts: true, // Natively builds bundled declaration files right into the entry paths
+			dts: {
+				isolated: true,
+			},
 		},
 	],
 	output: {
@@ -24,14 +25,13 @@ export default defineConfig({
 		//	/^[^./\\]+/, // Matches bare specifiers like 'typescript', 'lodash', etc.
 		//	/^@/,         // Matches scoped packages like '@nestjs/core'
 		//],
-		// externals: [
-		// 	...Object.keys(pkg.dependencies || {}),
-		// 	...Object.keys(pkg.peerDependencies || {}),
-		// ],
-		externals: [ "typescript" ],
+		externals: [ "typescript", "rslib",
+			...Object.keys(pkg.devDependencies || {}),
+			...Object.keys(pkg.peerDependencies || {}),
+		],
 	},
 	source: {
-		// This single map naturally creates the directories you want
+		// Creates a directory for each export
 		entry: {
 			"node-server/index": "./node-server/index.ts",
 			"universal-server/index": "./universal-server/index.ts",
@@ -40,7 +40,6 @@ export default defineConfig({
 	tools: {
 		rspack: {
 			output: {
-				// Prevents code-splitting on your dynamic import() modules
 				asyncChunks: true,
 			},
 		},

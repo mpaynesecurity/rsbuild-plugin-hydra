@@ -1,20 +1,58 @@
-# Rsbuild Plugin Hydra
+# Introduction
 
-## Setup
+Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app into a fullstack framework.
 
-Install the dependencies:
+## What's in the name?
+
+The Hydra originated from Greek mythology as a multi-headed serpent-like creature. Much like it's namesake,
+Rsbuild-plugin-hydra has multiple heads, each one representing what I felt was missing in the current ecosystem.
+
+### The Hydra's Heads
+
+1) **Integrated backend:** No more managing separate front and back ends.
+2) **Simplified DX:** Place a standard Hono route in the `api` folder and it will automatically registered.
+3) **Minimize vendor lock in:**. Hydra can be used with any front-end framework supported by Rsbuild.
+4) **Cloud-agnostic:** Runs on any cloud provider which supports the browser native `fetch` as its default export.
+
+## Install the plugin
 
 ```bash
-bun install
+bun add @mpaynesecurity/rsbuild-plugin-hydra
 ```
 
-## Get started
+## Add it to the plugins array
 
-Start the dev server, and the app will be available at [http://localhost:3000](http://localhost:3000).
+```ts
+import { defineConfig } from "@rsbuild/core"
+import { hydra } from "@mpaynesecurity/hydra"
+
+export default defineConfig({
+	plugins: [
+		hydra({
+			apiDirectory: "sandbox/api",
+			generatedRoutesFile: "sandbox/api-routes.gen.ts",
+			completedBuildFileName: "index.mjs",
+		})
+	]
+})
+```
+
+## Development
+
+#### HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
 
 ```bash
-bun run dev
+# HMR will not work
+bunx --bun rsbuild
 ```
+
+#### Use the standard Node runtime instead.
+
+```bash
+bun run rsbuild
+```
+
+## Production build
 
 Build the app for production:
 
@@ -22,15 +60,20 @@ Build the app for production:
 bun run build
 ```
 
-Preview the production build locally:
+## Preview using Cloudflare Wrangler
+
+Preview the production build in a simulated Cloudflare Workers environment:
 
 ```bash
-bun run preview
+wrangler dev
 ```
 
-## Learn more
+## Preview using Bun runtime
 
-To learn more about Rsbuild, check out the following resources:
+Preview the production build using your locally installed Bun runtime:
 
-- [Rsbuild documentation](https://rsbuild.rs) - explore Rsbuild features and APIs.
-- [Rsbuild GitHub repository](https://github.com/web-infra-dev/rsbuild) - your feedback and contributions are welcome!
+```bash
+bun dist/index.mjs
+```
+
+

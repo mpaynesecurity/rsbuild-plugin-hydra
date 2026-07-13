@@ -3,7 +3,12 @@
 		"isolatedModules": true,
 		"resolveJsonModule": true
 	},
-	"extends": ["../tsconfig.json"],
+	"extends": [
+		"../tsconfig.json"
+	],
 	"include": [
-		"universal-server", "./rslib.config.ts", "node-server"]
+		"universal-server",
+		"./rslib.config.ts",
+		"node-server"
+	]
 }

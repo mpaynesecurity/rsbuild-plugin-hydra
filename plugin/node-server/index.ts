@@ -1,6 +1,6 @@
 import MagicString from "magic-string"
 import type { RsbuildPlugin } from "@rsbuild/core"
-import glob from "fast-glob"
+import { glob } from "fast-glob"
 import { resolve, dirname, relative, extname } from "node:path"
 import { mkdir, writeFile, readFile } from "node:fs/promises"
 

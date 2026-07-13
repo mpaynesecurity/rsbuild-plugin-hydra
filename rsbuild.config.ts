@@ -2,7 +2,7 @@ import { defineConfig } from "@rsbuild/core"
 import { pluginBabel } from "@rsbuild/plugin-babel"
 import { pluginSolid } from "@rsbuild/plugin-solid"
 import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
-import { hydra } from "./plugin/universal-server"
+import { hydra } from "./plugin/dist/universal-server"
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
@@ -25,5 +25,6 @@ export default defineConfig({
 	},
 	server: {
 		port: 3001,
+		publicDir: false,
 	},
 })

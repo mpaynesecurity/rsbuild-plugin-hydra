@@ -1,0 +1,25 @@
+{
+	"name": "pkg-sandbox",
+	"type": "module",
+	"scripts": {
+		"build:lib": "bunx --bun rslib",
+		"clean": "rm -rf node_modules"
+	},
+	"dependencies": {
+	},
+	"devDependencies": {
+		"@types/bun": "catalog:",
+		"@types/node": "catalog:",
+		"hono": "catalog:",
+		"@hono/standard-validator": "catalog:",
+		"@hono/valibot-validator": "catalog:",
+		"@scalar/hono-api-reference": "catalog:",
+		"hono-openapi": "catalog:",
+		"@valibot/to-json-schema": "catalog:",
+		"valibot": "catalog:",
+		"jsdom": "catalog:",
+		"@rsbuild/plugin-solid": "catalog:",
+		"@solidjs/router": "catalog:",
+		"solid-js": "catalog:"
+	}
+}

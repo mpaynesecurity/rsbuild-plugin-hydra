@@ -1,10 +1,11 @@
 import MagicString from "magic-string"
 import type { RsbuildPlugin } from "@rsbuild/core"
 import { getRequestListener } from "@hono/node-server"
-import glob from "fast-glob"
 import { resolve, dirname, relative, extname } from "node:path"
 import { mkdir, writeFile, readFile } from "node:fs/promises"
 import { pathToFileURL } from "node:url"
+import { type TranspileOutput } from "typescript"
+import { glob } from "fast-glob"
 
 interface PluginOptions {
 	apiDirectory: string
@@ -21,13 +22,15 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 	
 	let isRouterFileWriting = false
 	
-	// === 1. DEV ROUTER FILE GENERATION FUNCTION (COMPLETELY INTACT / NEVER REMOVED) ===
+	// === 1. DEV ROUTER FILE GENERATION ===
 	const buildPhysicalRouterFile = async () => {
 		if( isRouterFileWriting ) return
 		isRouterFileWriting = true
 		
 		try {
+			
 			const files = await glob(`**/*.{ts,js}`, { cwd: resolve(apiDir) })
+			
 			const outputDir = dirname(resolvedOutputPath)
 			
 			const msCodeLines = new MagicString("")
@@ -55,11 +58,10 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 				const cleanRoute = urlPath === "index" ? "/" : `/${ urlPath }`
 				
 				msCodeLines.append(`const untypedInstance_${ index }: any = ${ namespaceName }\n`)
-				msCodeLines.append(`const subApp_${ index } = untypedInstance_${ index }.default || untypedInstance_${ index }.app || untypedInstance_${ index }\n`)
-				
-				msCodeLines.append(`if (subApp_${ index } && typeof subApp_${ index }.fetch === "function") {\n`)
-				msCodeLines.append(`  app.route('${ cleanRoute }', subApp_${ index })\n`)
-				msCodeLines.append(`}\n`)
+				           .append(`const subApp_${ index } = untypedInstance_${ index }.default || untypedInstance_${ index }.app || untypedInstance_${ index }\n`)
+				           .append(`if (subApp_${ index } && typeof subApp_${ index }.fetch === "function") {\n`)
+				           .append(`\tapp.route('${ cleanRoute }', subApp_${ index })\n}\n`)
+				//msCodeLines.append(`}\n`)
 			})
 			
 			await mkdir(outputDir, { recursive: true })
@@ -74,9 +76,32 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 		name: "rsbuild-plugin-hydra",
 		
 		async setup(api) {
-			// === 2. COMPILER HOOK REGISTRATIONS (COMPLETELY INTACT) ===
+			// === 2. COMPILER HOOK REGISTRATIONS  ===
 			api.onBeforeBuild(async () => {
 				await buildPhysicalRouterFile()
+			})
+			// === AUTOMATED SERVER WATCHER FOR API DIRECTORY===
+			api.modifyRsbuildConfig((config) => {
+				// Initialize the dev config object safely if it doesn't exist
+				config.dev = config.dev || {}
+				
+				// Enforce an array structure so we don't accidentally overwrite
+				// other watch files the user might have configured manually
+				const existingWatchFiles = Array.isArray(config.dev.watchFiles)
+				                           ? config.dev.watchFiles
+				                           : config.dev.watchFiles
+				                             ? [ config.dev.watchFiles ]
+				                             : []
+				
+				config.dev.watchFiles = [
+					...existingWatchFiles,
+					{
+						type: "reload-server", // Forces a full native Node CLI process reboot
+						paths: [
+							`${ resolve(options.apiDirectory) }/**/*`,
+						],
+					},
+				]
 			})
 			
 			api.onBeforeStartDevServer(async () => {
@@ -120,6 +145,8 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 				const serverOutputFile = resolve(prodDistPath, options.completedBuildFileName ?? "server.mjs")
 				
 				// Scan and pull EVERY single produced client asset file inside dist recursively
+				
+				//const allClientAssets = await glob("**/*", { cwd: prodDistPath, onlyFiles: true })
 				const allClientAssets = await glob("**/*", { cwd: prodDistPath, onlyFiles: true })
 				
 				//let assetPayloadDictionary = "{\n"
@@ -161,9 +188,9 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 					const file = files[i]
 					const rawCodeText = await readFile(resolve(apiDir, file), "utf-8")
 					
-					const transpiledResult = ts.default.transpileModule(rawCodeText, {
+					const transpiledResult: TranspileOutput = ts.default.transpileModule(rawCodeText, {
 						compilerOptions: {
-							target: ts.default.ScriptTarget.ES2022,
+							target: ts.default.ScriptTarget.ES2024,
 							module: ts.default.ModuleKind.ESNext,
 						},
 					})

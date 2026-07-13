@@ -1,7 +1,28 @@
 {
+	"name": "@mpaynesecurity/rsbuild-plugin-hydra",
 	"type": "module",
 	"scripts": {
-		"build:lib": "bunx rslib"
+		"build": "rslib",
+		"clean": "rm -rf node_modules"
+	},
+	"dependencies": {
+		"hono": "catalog:",
+		"@hono/node-server": "catalog:",
+		"fast-glob": "catalog:",
+		"magic-string": "catalog:",
+		"@hono/standard-validator": "catalog:",
+		"@valibot/to-json-schema": "catalog:",
+		"valibot": "catalog:"
+	},
+	"devDependencies": {
+		"@types/bun": "catalog:",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"@types/bun": "catalog:",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
 	},
 	"exports": {
 		"./node": {
