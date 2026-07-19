@@ -30,8 +30,8 @@
 			"import": "./dist/node/index.js"
 		},
 		"./universal": {
-			"types": "./dist/universal/index.d.ts",
-			"import": "./dist/universal/index.js"
+			"types": "./dist/universal-server/index.d.ts",
+			"import": "./dist/universal-server/index.js"
 		}
 	}
 }
