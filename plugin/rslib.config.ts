@@ -1,5 +1,5 @@
 import { defineConfig } from "@rslib/core"
-import pkg from "./package.json" with { type: "json" }
+import * as pkg from "./package.json" with { type: "json" }
 
 export default defineConfig({
 	lib: [
@@ -12,7 +12,9 @@ export default defineConfig({
 		},
 	],
 	output: {
-		legalComments: "inline", // Inlines legal notices; stops *.LICENSE.txt sidecars
+		sourceMap: false,
+		// Inlines legal notices; stops *.LICENSE.txt sidecars
+		legalComments: "inline",
 		// Overrides Rslib's internal flattening to force files to honor their entry keys
 		filename: {
 			js: "[name].js",
@@ -20,21 +22,22 @@ export default defineConfig({
 		cleanDistPath: true,
 		target: "node",
 		module: true,
-		
-		//externals: [
-		//	/^[^./\\]+/, // Matches bare specifiers like 'typescript', 'lodash', etc.
-		//	/^@/,         // Matches scoped packages like '@nestjs/core'
-		//],
-		externals: [ "typescript", "rslib",
-			...Object.keys(pkg.devDependencies || {}),
-			...Object.keys(pkg.peerDependencies || {}),
-		],
+		minify: {
+			jsOptions: {
+				minimizerOptions: {
+					// maintain function names
+					mangle: false,
+					minify: true,
+				},
+			},
+		},
+		autoExternal: true,
+		// do not bundle dev dependencies
+		externals: [ ...Object.keys(pkg.devDependencies) ],
 	},
 	source: {
-		// Creates a directory for each export
 		entry: {
-			"node-server/index": "./node-server/index.ts",
-			"universal-server/index": "./universal-server/index.ts",
+			"index": "index.ts",
 		},
 	},
 	tools: {
