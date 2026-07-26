@@ -1,1 +1,37 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+body {
+    background-color: oklch(23% 2% 259deg);
+}
+
+.nav-link {
+    @apply text-gray-300 hover:bg-indigo-600 px-3 py-2 rounded-md font-medium transition-colors flex-1
+}
+
+.mobile-nav-link {
+    @apply block text-gray-300 hover:bg-indigo-600 px-3 py-2 rounded-md font-medium transition-colors
+}
+
+.card-header {
+    @apply bg-dark-card-header rounded-t-xl p-1
+}
+
+.card-footer {
+    @apply bg-dark-card-header rounded-b-xl p-1
+}
+
+.card {
+    @apply h-fit rounded-xl  border-gray-500/80 bg-card-body p-3 shadow-sm
+}
+
+.label {
+    @apply font-bold text-cyan-50
+}
+
+@theme {
+    --color-body: oklch(15% 2% 277deg);
+    --color-navbar: oklch(27% 4% 265deg);
+    --color-dark-gray: oklch(23% 2% 259deg);
+    --color-dark-card-header: oklch(21% 1% 265deg);
+    --color-card-body: oklch(0.252 0.014 267.008)
+}

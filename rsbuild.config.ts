@@ -2,7 +2,7 @@ import { defineConfig } from "@rsbuild/core"
 import { pluginBabel } from "@rsbuild/plugin-babel"
 import { pluginSolid } from "@rsbuild/plugin-solid"
 import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
-import { hydra } from "./plugin/dist/universal-server"
+import { hydra } from "@mpaynesecurity/rsbuild-plugin-hydra"
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
@@ -18,6 +18,17 @@ export default defineConfig({
 			completedBuildFileName: "index.mjs",
 		}),
 	],
+	output: {
+		minify: true,
+	},
+	tools: {
+		htmlPlugin: {
+			title: "Plugin Sandbox",
+		},
+		lightningcssLoader: {
+			minify: true,
+		},
+	},
 	source: {
 		entry: {
 			index: "./sandbox/index.tsx",

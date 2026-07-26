@@ -22,6 +22,10 @@
 		"allowImportingTsExtensions": true,
 		/* type checking */
 		"noUnusedLocals": false,
-		"noUnusedParameters": true
+		"noUnusedParameters": true,
+		"paths": {
+			"@/components": ["./sandbox/components/index.ts"],
+			"@/layouts": ["./sandbox/layouts/index.ts"]
+		}
 	}
 }
