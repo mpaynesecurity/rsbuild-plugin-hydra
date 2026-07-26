@@ -2,6 +2,7 @@
 	"name": "@mpaynesecurity/rsbuild-plugin-hydra",
 	"type": "module",
 	"scripts": {
+		"build:rsdoctor": "cross-env RSDOCTOR=true rslib",
 		"build": "rslib",
 		"clean": "rm -rf node_modules"
 	},
@@ -9,29 +10,29 @@
 		"hono": "catalog:",
 		"@hono/node-server": "catalog:",
 		"fast-glob": "catalog:",
-		"magic-string": "catalog:",
-		"@hono/standard-validator": "catalog:",
-		"@valibot/to-json-schema": "catalog:",
-		"valibot": "catalog:"
+		"magic-string": "catalog:"
 	},
 	"devDependencies": {
 		"@types/bun": "catalog:",
 		"@types/node": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"@rsdoctor/rspack-plugin": "catalog:",
+		"cross-env": "^10.1.0"
 	},
 	"peerDependencies": {
 		"@types/bun": "catalog:",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
 	},
+	"peerDependenciesMeta": {
+		"typescript": {
+			"optional": false
+		}
+	},
 	"exports": {
-		"./node": {
-			"types": "./dist/node/index.d.ts",
-			"import": "./dist/node/index.js"
-		},
-		"./universal": {
-			"types": "./dist/universal-server/index.d.ts",
-			"import": "./dist/universal-server/index.js"
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
 		}
 	}
 }
