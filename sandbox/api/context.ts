@@ -26,7 +26,10 @@ const app = new Hono<Ctx>().get(
 	}),
 	validator("query", querySchema), (c) => {
 		const query = c.req.valid("query")
-		return c.text(`Hello ${ query?.message ?? "Hono" }!`)
+		
+		return c.json({
+			message: `${ query?.message }`,
+		})
 	},
 )
 

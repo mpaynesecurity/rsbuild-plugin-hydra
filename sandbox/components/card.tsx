@@ -8,7 +8,7 @@ interface CardProps {
 
 export const Card = (props: CardProps) => {
 	return (
-		<div class={ "card border" }>
+		<div class={ "card" }>
 			<Show when={ props.headerContent }>
 				{ props.headerContent }
 			</Show>

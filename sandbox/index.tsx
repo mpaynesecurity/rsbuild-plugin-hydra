@@ -9,6 +9,14 @@ const routes = [
 		path: "/",
 		component: lazy(() => import("./pages/index.tsx")),
 	},
+	{
+		path: "/context",
+		component: lazy(() => import("./pages/context.tsx")),
+	},
+	{
+		path: "/scalar",
+		component: lazy(() => import("./pages/scalar.tsx")),
+	},
 ] satisfies RouteDefinition[]
 
 const root = document.getElementById("root")

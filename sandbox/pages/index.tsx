@@ -1,9 +1,9 @@
 import { Card } from "@/components"
 import { hc } from "hono/client"
 import { createResource, For, Show } from "solid-js"
-import { type AppType } from "../api/os-info"
+import { type AppType } from "../api/os-info.ts"
 
-const client = hc<AppType>("http://localhost:3001/api/os-info")
+const client = hc<AppType>("http://localhost:3002/api/os-info")
 
 const fetchOsInfo = async () => {
 	const response = await client.index.$get()
@@ -17,17 +17,17 @@ export default () => {
 	const [ stats ] = createResource(fetchOsInfo)
 	
 	return (
-		<>
+		<div>
 			{/* Handle Solid's loading and error states natively */ }
 			<Show when={ !stats.loading } fallback={ <p>Loading metrics...</p> }>
 				<Show when={ !stats.error }>
-					<div class={ "flex gap-5 mt-5 justify-center" }>
+					<div class={ "flex gap-5 mt-5 p-2 justify-center md:flex-col" }>
 						<Card
 							headerContent={
 								<h1 class={ "text-cyan-50 mb-3 text-center" }><strong>Host Stats</strong></h1>
 							}
 							bodyContent={
-								<ul>
+								<ul class="bg-dark">
 									<li class={ "text-cyan-50" }><strong>Host:</strong> { stats()?.hostName }</li>
 									<li class={ "text-cyan-50" }><strong>Arch:</strong> { stats()?.cpuArch }</li>
 									<li class={ "text-cyan-50" }><strong>Memory:</strong> { stats()?.totalMemory }</li>
@@ -37,25 +37,38 @@ export default () => {
 								</ul>
 							} />
 						<Card
-							headerContent={
-								<h1 class={ "text-cyan-50 mb-3 text-center" }>
-									<strong>Network Interfaces</strong
-									></h1>
-							}
 							bodyContent={
-								<For each={ stats()?.nics }>
-									{ (item) => (
-										<div class={ "grid grid-cols-2 gap-5" }>
-											<p class={ "text-cyan-50" }>IP: { item?.address }</p>
-											<p class={ "text-cyan-50" }>Mac: { item?.mac }</p>
-										</div>
-									) }
-								</For>
-							} />
+								<div class="w-full text-cyan-50 bg-dark rounded-md border border-slate-800 overflow-hidden">
+									
+									{/* HEADER ROW - 4 locked columns, perfectly aligned and centered */ }
+									<div class="grid grid-cols-4 gap-4 bg-slate-900 px-4 py-3 text-center font-bold border-b border-slate-800 text-sm tracking-wide">
+										<div>IP Family</div>
+										<div>IP Address</div>
+										<div>Mac Address</div>
+										<div>Netmask</div>
+									</div>
+									
+									{/* DATA ROWS - Guaranteed to align with the headers above */ }
+									<div class="divide-y divide-slate-800">
+										<For each={ stats()?.nics }>
+											{ (item) => (
+												<div class="grid grid-cols-4 gap-4 px-4 py-3 text-center items-center text-sm hover:bg-slate-800/30 transition-colors">
+													<div class="font-medium text-cyan-200">{ item?.family }</div>
+													<div class="font-mono break-all selection:bg-cyan-500/30">{ item?.address }</div>
+													<div class="font-mono text-xs tracking-tight">{ item?.mac }</div>
+													<div class="font-mono">{ item?.netmask }</div>
+												</div>
+											) }
+										</For>
+									</div>
+								
+								</div>
+							}
+						/>
+					
 					</div>
 				</Show>
 			</Show>
-		
-		</>
+		</div>
 	)
 }

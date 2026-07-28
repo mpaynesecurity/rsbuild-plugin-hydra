@@ -1,28 +1,32 @@
-import { createSignal } from "solid-js"
 import { A } from "@solidjs/router"
+import { createSignal, For } from "solid-js"
 
 export const Navbar = () => {
 	const [ isOpen, setIsOpen ] = createSignal(false)
 	
+	const routes = [
+		{ path: "/", label: "Home", exact: true },
+		{ path: "/context", label: "Context", exact: false },
+		{ path: "/scalar", label: "Scalar", exact: false },
+	]
+	
 	return (
-		<nav class="bg-navbar shadow-md w-full top-0">
+		<nav class="bg-navbar shadow-md w-full top-0 mb-5">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex items-center justify-end h-16">
 					
 					{/* Desktop Menu */ }
 					<div class="hidden md:flex space-x-8">
-						<A href="/" class="nav-link">Home</A>
-						<A href="#" class="nav-link">Databases</A>
-						<A href="/api/openapi" class="nav-link">OpenAPI</A>
-						<A href="/api/scalar" class="nav-link">Scalar</A>
+						<For each={ routes }>
+							{ (route) => (
+								<A href={ route.path }
+									class="navlink"
+									activeClass="bg-indigo-600"
+									end={ route.exact }
+								>{ route.label }</A>
+							) }
+						</For>
 					</div>
-					
-					{/* Desktop CTA Button */ }
-					{/* <div class="hidden md:block"> */ }
-					{/* 	<a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors"> */ }
-					{/* 		Sign Up */ }
-					{/* 	</a> */ }
-					{/* </div> */ }
 					
 					{/* Mobile Menu Button */ }
 					<div class="md:hidden flex items-center">
@@ -48,13 +52,16 @@ export const Navbar = () => {
 			</div>
 			
 			{/* Mobile Menu */ }
-			<div
-				class={ `md:hidden bg-navbar/60 px-4 pt-2 pb-4 space-y-1 shadow-inner ${ isOpen() ? "block" : "hidden" }` }
-			>
-				<A href="/" class="mobile-nav-link">Home</A>
-				<a href="#" class="mobile-nav-link">Databases</a>
-				<A href="/api/openapi" class="mobile-nav-link">OpenAPI</A>
-				<A href="/api/scalar" class="mobile-nav-link">Scalar</A>
+			<div class={ `md:hidden bg-navbar/60 px-4 pt-2 pb-4 space-y-1 shadow-inner ${ isOpen() ? "block" : "hidden" }` }>
+				<For each={ routes }>
+					{ (route) => (
+						<A href={ route.path }
+							class="mobile-navlink"
+							activeClass={ `bg-indigo-600 ${ isOpen() ? "block" : "hidden" }` }
+							end={ route.exact }
+						>{ route.label }</A>
+					) }
+				</For>
 			</div>
 		</nav>
 	)

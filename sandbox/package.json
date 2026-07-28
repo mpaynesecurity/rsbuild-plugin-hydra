@@ -1,12 +1,19 @@
 {
 	"name": "pkg-sandbox",
 	"type": "module",
+	"version": "1.0.0",
 	"scripts": {
 		"clean": "rm -rf node_modules"
 	},
 	"dependencies": {
-		"@hono/node-server": "catalog:",
-		"hono": "catalog:"
+		"hono": "catalog:",
+		"@valibot/to-json-schema": "catalog:",
+		"valibot": "catalog:",
+		"hono-openapi": "catalog:",
+		"@scalar/hono-api-reference": "catalog:",
+		"@hono/structured-logger": "catalog:",
+		"pino": "catalog:",
+		"@scalar/api-reference": "^1.63.0"
 	},
 	"devDependencies": {
 		"@types/bun": "catalog:",
