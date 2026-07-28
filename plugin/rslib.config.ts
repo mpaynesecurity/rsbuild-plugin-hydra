@@ -38,6 +38,8 @@ export default defineConfig({
 	source: {
 		entry: {
 			"index": "index.ts",
+			"http/index": "./http/index.ts",
+			"env/index": "./env/index.ts",
 		},
 	},
 	tools: {

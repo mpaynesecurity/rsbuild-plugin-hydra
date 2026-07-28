@@ -10,7 +10,8 @@
 		"hono": "catalog:",
 		"@hono/node-server": "catalog:",
 		"fast-glob": "catalog:",
-		"magic-string": "catalog:"
+		"magic-string": "catalog:",
+		"ofetch": "catalog:"
 	},
 	"devDependencies": {
 		"@types/bun": "catalog:",
@@ -33,6 +34,14 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
+		},
+		"./http": {
+			"types": "./dist/http/index.d.ts",
+			"import": "./dist/http/index.js"
+		},
+		"./env": {
+			"types": "./dist/env/index.d.ts",
+			"import": "./dist/env/index.js"
 		}
 	}
 }

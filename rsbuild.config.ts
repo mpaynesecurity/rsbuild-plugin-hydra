@@ -3,6 +3,8 @@ import { pluginBabel } from "@rsbuild/plugin-babel"
 import { pluginSolid } from "@rsbuild/plugin-solid"
 import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
 import { hydra } from "@mpaynesecurity/rsbuild-plugin-hydra"
+import { env } from "./validate-env"
+
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
@@ -16,6 +18,7 @@ export default defineConfig({
 			apiDirectory: "sandbox/api",
 			generatedRoutesFile: "sandbox/api-routes.gen.ts",
 			completedBuildFileName: "index.mjs",
+			contextFile: "context.ts",
 		}),
 	],
 	output: {
@@ -35,7 +38,7 @@ export default defineConfig({
 		},
 	},
 	server: {
-		port: 3001,
+		port: env.data.PORT,
 		publicDir: false,
 	},
 })

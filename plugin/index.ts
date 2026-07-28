@@ -2,7 +2,7 @@ import { getRequestListener } from "@hono/node-server"
 import type { RsbuildPlugin } from "@rsbuild/core"
 import { glob } from "fast-glob"
 import MagicString from "magic-string"
-import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { mkdir, readFile, writeFile, stat } from "node:fs/promises"
 import { dirname, extname, relative, resolve } from "node:path"
 import { pathToFileURL } from "node:url"
 import { type TranspileOutput } from "typescript"
@@ -10,7 +10,6 @@ import { type TranspileOutput } from "typescript"
 interface PluginOptions {
 	/**
 	 * Path where Hono api routes are stored
-	 * @default src/api
 	 */
 	apiDirectory: string
 	/**
@@ -28,12 +27,20 @@ interface PluginOptions {
 	 * @default index.mjs
 	 */
 	completedBuildFileName?: string
+	/**
+	 * Path to Hono context file.
+	 * Will be created if it does not exist
+	 * @default src/api/ctx.ts
+	 */
+	contextFile?: string
 }
 
 export const hydra = (options: PluginOptions): RsbuildPlugin => {
 	const apiDir = options.apiDirectory
 	const generatedRoutesFile = options.generatedRoutesFile ?? "api.routes.ts"
 	const buildArtifactsOutputDirectory = options.buildArtifactsOutputDirectory ?? "dist"
+	const ctxFile = options.contextFile
+	
 	const resolvedOutputPath = resolve(generatedRoutesFile)
 	
 	let isRouterFileWriting = false
@@ -48,9 +55,19 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 			
 			const outputDir = dirname(resolvedOutputPath)
 			
+			if( !ctxFile ) {
+				if( !await stat(ctxFile!) ) {
+					const ctx = new MagicString("export type Ctx = {}\n")
+					await writeFile(ctxFile!, ctx.toString())
+				}
+			}
+			console.info(`Using ${ options.contextFile } as Hono context`)
 			const codeLines = new MagicString("")
 				.append(`import { Hono } from "hono"\n`)
-				.append(`export const app = new Hono().basePath("/api")\n`)
+				.append(`import { contextStorage } from "hono/context-storage"\n`)
+				.append(`import { type Ctx } from "./${ options.contextFile }"\n\n`)
+				.append(`export const app = new Hono<Ctx>().basePath("/api")\n\n`)
+				.append("app.use(contextStorage())\n")
 			
 			files.forEach((file, index) => {
 				const namespaceName = `rawModule_${ index }`
