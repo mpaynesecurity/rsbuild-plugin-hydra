@@ -1,12 +1,17 @@
 [
 	{
 		"type": "dir-section-header",
-		"name": "start",
-		"label": "Getting Started"
+		"name": "introduction",
+		"label": "Introduction"
 	},
 	{
 		"type": "dir-section-header",
-		"name": "prod",
-		"label": "Using in Production"
+		"name": "development",
+		"label": "Development"
+	},
+	{
+		"type": "dir-section-header",
+		"name": "production",
+		"label": "Production"
 	}
 ]

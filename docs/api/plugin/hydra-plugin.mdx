@@ -1,0 +1,43 @@
+---
+title: Hydra
+---
+
+### Function
+```ts
+const hydra = (options: PluginOptions): RsbuildPlugin => {}
+```
+
+### Options
+```ts
+interface PluginOptions {
+	/**
+	 * Path where Hono api routes are stored
+	 */
+	apiDirectory: string
+	/**
+	 * Where the auto-generated Hono routes file is places
+	 * @default src/api-routes.gen.ts
+	 */
+	generatedRoutesFile?: string
+	/**
+	 * Location for the final build artifacts (css, js, etc)
+	 * @default dist
+	 */
+	buildArtifactsOutputDirectory?: string
+	/**
+	 * Name of the entry point for the production build
+	 * @default index.mjs
+	 */
+	completedBuildFileName?: string
+	/**
+	 * Path to Hono context file.
+	 * Will be created if it does not exist
+	 * @default src/api/ctx.ts
+	 */
+	contextFile?: string
+}
+```
+
+### Examples
+```ts
+```

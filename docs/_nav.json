@@ -1,18 +1,18 @@
 [
 	{
 		"text": "Guide",
-		"link": "/guide/start/introduction",
+		"link": "/guide/introduction",
 		"activeMatch": "/guide/"
+	},
+	{
+		"text": "Utilities",
+		"link": "/utilities/",
+		"activeMatch": "/utilities/"
 	},
 	{
 		"text": "API",
 		"link": "/api/",
 		"activeMatch": "/api/"
-	},
-	{
-		"text": "Testing",
-		"link": "/testing/",
-		"activeMatch": "/testing/"
 	},
 	{
 		"text": "In-Depth",

@@ -1,0 +1,37 @@
+---
+title: Getting Started
+---
+
+import { PackageManagerTabs } from "@rspress/core/theme"
+import Setup from "./setup.mdx"
+
+
+## Install the plugin
+
+<PackageManagerTabs command="install @mpaynesecurity/rsbuild-plugin-hydra" />
+
+
+## Add to the plugins array
+<Setup />
+
+## Start the local development server
+
+:::warning
+HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
+```bash
+# HMR Does not work
+bunx --bun rsbuild
+````
+
+Use the Node runtime during development
+```bash
+rsbuild
+````
+:::
+
+
+## Next steps
+
+- Learn how Hydra works by reviewing the [Source Code](/in-depth/plugin)
+- Test Hydra locally using the [Sandbox](/in-depth/sandbox) directory.
+

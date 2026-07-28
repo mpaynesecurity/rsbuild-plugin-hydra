@@ -1,11 +1,6 @@
 [
 	{
 		"type": "dir-section-header",
-		"name": "plugin",
-		"label": "Plugin"
-	},
-	{
-		"type": "dir-section-header",
 		"name": "http",
 		"label": "HTTP"
 	},

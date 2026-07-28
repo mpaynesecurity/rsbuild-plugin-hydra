@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="sandbox:test" type="js.build_tools.npm" nameIsGenerated="true">
+  <configuration default="false" name="sandbox:node" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
-      <script value="sandbox:test" />
+      <script value="sandbox:node" />
     </scripts>
     <node-interpreter value="project" />
     <envs />

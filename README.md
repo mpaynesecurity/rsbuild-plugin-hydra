@@ -5,13 +5,13 @@ Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app i
 ## What's in the name?
 
 The Hydra originated from Greek mythology as a multi-headed serpent-like creature. Much like it's namesake,
-Rsbuild-plugin-hydra has multiple heads, each one representing what I felt was missing in the current ecosystem.
+Rsbuild-plugin-hydra has multiple heads, each one representing a Hono API route.
 
 ### The Hydra's Heads
 
 1) **Integrated backend:** No more managing separate front and back ends.
 2) **Simplified DX:** Place a standard Hono route in the `api` folder and it will automatically registered.
-3) **Minimize vendor lock in:**. Hydra can be used with any front-end framework supported by Rsbuild.
+3) **UI Agnostic:** Works with any front-end framework supported by Rsbuild.
 4) **Cloud-agnostic:** Runs on any cloud provider which supports the browser native `fetch` as its default export.
 
 ## Install the plugin
@@ -29,8 +29,8 @@ import { hydra } from "@mpaynesecurity/hydra"
 export default defineConfig({
 	plugins: [
 		hydra({
-			apiDirectory: "sandbox/api",
-			generatedRoutesFile: "sandbox/api-routes.gen.ts",
+			apiDirectory: "/path/to/api",
+			generatedRoutesFile: "/path/to/folder/filename.ts",
 			completedBuildFileName: "index.mjs",
 		})
 	]
@@ -39,7 +39,23 @@ export default defineConfig({
 
 ## Development
 
-#### HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
+### Add an API Route
+
+```ts
+//src/api/test.ts
+import { Hono } from "hono"
+
+const app = new Hono()
+
+app.get("/", (c) => {
+	return c.json({ message: "IT WORKED" })
+})
+export default app
+```
+
+### Run the dev server
+
+#### NOTE: HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
 
 ```bash
 # HMR will not work
@@ -49,7 +65,7 @@ bunx --bun rsbuild
 #### Use the standard Node runtime instead.
 
 ```bash
-bun run rsbuild
+rsbuild
 ```
 
 ## Production build
@@ -60,6 +76,14 @@ Build the app for production:
 bun run build
 ```
 
+## Preview using Bun runtime
+
+Preview the production build using your locally installed Bun runtime:
+
+```bash
+bun dist/index.mjs
+```
+
 ## Preview using Cloudflare Wrangler
 
 Preview the production build in a simulated Cloudflare Workers environment:
@@ -68,12 +92,6 @@ Preview the production build in a simulated Cloudflare Workers environment:
 wrangler dev
 ```
 
-## Preview using Bun runtime
-
-Preview the production build using your locally installed Bun runtime:
-
-```bash
-bun dist/index.mjs
-```
+## Caveats
 
 

@@ -1,0 +1,20 @@
+---
+title: Local
+---
+
+## Preview using Bun runtime
+
+Preview the production build using your locally installed Bun runtime:
+
+```bash
+bun dist/index.mjs
+```
+
+## Known Bugs/Issues
+
+:::warning
+
+The production code does not work the Node runtime as it does not support the default exported web native fetch
+required by modern platforms such as Cloudflare and Vercel.
+
+:::

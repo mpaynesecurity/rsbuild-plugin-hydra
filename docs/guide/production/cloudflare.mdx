@@ -1,0 +1,34 @@
+---
+title: Cloudflare
+---
+
+import { CodeBlockRuntime } from "@rspress/core/theme"
+import { transformerNotationHighlight } from "@shikijs/transformers"
+
+### Setup the Wrangler config file
+<CodeBlockRuntime
+	lang="json"
+	title="wrangler.jsonc"
+	code={`
+	{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "rsbuild-plugin-hydra",
+	"compatibility_date": "2026-07-12",
+	"main": "dist/index.mjs",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"dev": {
+		"generate_types": true
+	}
+})`}
+	shikiOptions={{
+		transformers: [ transformerNotationHighlight() ],
+	}}
+/>
+
+### Run on Cloudflare Workers
+
+```bash
+wrangler dev
+```
