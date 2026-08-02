@@ -1,0 +1,35 @@
+---
+title: Logger
+---
+
+### Function
+```ts
+export const logger: ConsolaInstance = createConsola({})
+````
+### Options
+#### ExtendedOptions
+```ts
+interface ExtendedOptions extends Omit<ConsolaOptions, "types"> {}
+```
+### Example
+```ts
+import {createConsola} from "consola/core"
+const logger = createConsola({
+	types: {
+		myCustomLoggerType : {
+			tag: "my-tag"
+		}
+	}
+})
+```
+
+### Log levels
+| 0                | 1               | 2              | 3                  | 4              | 5              |
+|------------------|-----------------|----------------|--------------------|----------------|----------------|
+| Fatal & Error    | Warnings        | Normal         | Normal             | Debug          | Trace          |
+| ---------------- | --------------- | -------------- | ------------------ | -------        | -------        |
+| logger.fatal()   | logger.warn()   | logger.log()   | logger.info()      | logger.debug() | logger.trace() |
+| logger.error()   |                 |                | logger.success()   |                |                |
+|                  |                 |                | logger.ready()     |                |                |
+|                  |                 |                | logger.start()     |                |                |
+

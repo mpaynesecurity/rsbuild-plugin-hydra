@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Quick Start
-      link: /guide/start/introduction
+      link: /guide/introduction
 
     - theme: alt
       text: GitHub

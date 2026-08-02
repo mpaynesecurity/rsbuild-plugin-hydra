@@ -1,0 +1,29 @@
+{
+	"name": "pkg-docs",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"build": "rspress build",
+		"build:rsdoctor": "cross-env RSDOCTOR=true rspress build",
+		"clean": "rm -rf node_modules",
+		"dev": "rspress dev --port 4000",
+		"preview": "rspress preview"
+	},
+	"dependencies": {
+		"@rspress/core": "catalog:rstack"
+	},
+	"devDependencies": {
+		"@shikijs/transformers": "catalog:rstack",
+		"@types/node": "catalog:types",
+		"@types/bun": "catalog:types",
+		"@types/react": "catalog:types",
+		"@types/react-dom": "catalog:types",
+		"cross-env": "catalog:",
+		"react": "catalog:rstack",
+		"react-dom": "catalog:rstack",
+		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"typescript": "catalog:"
+	}
+}

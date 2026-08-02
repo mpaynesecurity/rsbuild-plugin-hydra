@@ -20,11 +20,12 @@
 		"isolatedModules": true,
 		/* type checking */
 		"strict": true,
+		"skipDefaultLibCheck": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true
 	},
 	"include": [
-		"./"
+		"*"
 	],
 	"mdx": {
 		"checkMdx": true

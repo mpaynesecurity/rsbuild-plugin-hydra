@@ -8,5 +8,10 @@
 		"type": "dir-section-header",
 		"name": "env",
 		"label": "Env"
+	},
+	{
+		"type": "dir-section-header",
+		"name": "logging",
+		"label": "Logger"
 	}
 ]

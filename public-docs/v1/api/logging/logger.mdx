@@ -1,0 +1,41 @@
+---
+title: Logger
+tag: New
+description: Logger functionality implemented through UnJS/Consola
+---
+
+### Function
+```ts
+export const logger: ConsolaInstance = createConsola({})
+```
+
+### Options
+#### Log Levels
+- 0: Fatal and Error
+- 1: Warnings
+- 2: Normal logs
+- 3: Informational logs, success, fail, ready, start
+- 4: Debug logs
+- -999: Silent
+- +999: Verbose
+
+#### Log Levels and Associated Methods
+| 0                 | 1             | 2            | 3                | 4              | 5              |
+|-------------------|---------------|--------------|------------------|----------------|----------------|
+| **Fatal & Error** | **Warnings**  | **Normal**   | **Information**  | **Debug**      | **Trace**      |
+|                   |               |              |                  |                |                |
+| logger.fatal()    | logger.warn() | logger.log() | logger.info()    | logger.debug() | logger.trace() |
+| logger.error()    |               |              | logger.success() |                |                |
+|                   |               |              | logger.ready()   |                |                |
+|                   |               |              | logger.start()   |                |                |
+
+```ts
+interface IOptions {
+	baseUrl?: string
+	port?: number | string
+}
+```
+
+### Examples
+```ts
+```

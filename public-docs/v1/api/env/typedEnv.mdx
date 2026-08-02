@@ -14,4 +14,9 @@ class TypedEnv<TSchema extends GenericObjectSchema>{}
 
 ### Examples
 ```ts
+import { TypedEnv } from "@mpaynesecurity/rsbuild-plugin-hydra/env"
+
+export const env = new TypedEnv(object({
+	PORT: pipe(string(), transform((val) => parseInt(val, 10)), number()),
+}))
 ```

@@ -1,10 +1,8 @@
 import { defineConfig } from "@rspress/core"
 
-const rootDir = process.cwd()
-
 export default defineConfig({
-	root: rootDir,
 	lang: "en",
+	root: "v1",
 	title: "Hydra Docs",
 	icon: "/favicon.ico",
 	themeConfig: {
@@ -15,5 +13,14 @@ export default defineConfig({
 				content: "https://github.com/payneusmc07/rsbuild-plugin-hydra",
 			},
 		],
+	},
+	builderConfig: {
+		tools: {
+			rspack: {
+				watchOptions: {
+					ignored: [ "node_modules" ],
+				},
+			},
+		},
 	},
 })
