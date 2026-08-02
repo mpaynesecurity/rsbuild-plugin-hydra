@@ -5,45 +5,63 @@ export default defineConfig({
 	lib: [
 		{
 			format: "esm",
-			syntax: "es2024",
+			syntax: "esnext",
+			id: "rsbuild-plugin-hydra",
+			output: {
+				minify: {
+					jsOptions: {
+						minimizerOptions: {
+							mangle: false,
+							minify: true,
+						},
+					},
+				},
+			},
 			dts: {
 				isolated: true,
 			},
 		},
 	],
 	output: {
-		sourceMap: false,
+		autoExternal: true,
+		cleanDistPath: true,
+		// Do not bundle dev dependencies
+		externals: [ ...Object.keys(pkg.devDependencies) ],
 		// Inlines legal notices; stops *.LICENSE.txt sidecars
 		legalComments: "inline",
-		// Overrides Rslib's internal flattening to force files to honor their entry keys
-		filename: {
-			js: "[name].js",
-		},
-		cleanDistPath: true,
-		target: "node",
-		module: true,
 		minify: {
 			jsOptions: {
 				minimizerOptions: {
 					// maintain function names
-					mangle: false,
-					minify: true,
+					mangle: {
+						keep_classnames: true,
+						keep_fnames: true,
+					},
+					compress: {},
 				},
 			},
 		},
-		autoExternal: true,
-		// do not bundle dev dependencies
-		externals: [ ...Object.keys(pkg.devDependencies) ],
+		module: true,
+		sourceMap: false,
+		target: "node",
 	},
 	source: {
 		entry: {
 			"index": "index.ts",
 			"http/index": "./http/index.ts",
 			"env/index": "./env/index.ts",
+			"logger/index": "./logger/index.ts",
 		},
 	},
 	tools: {
 		rspack: {
+			stats: {
+				errors: true,
+				errorDetails: true,
+				errorStack: false,
+				env: true,
+				runtime: true,
+			},
 			output: {
 				asyncChunks: true,
 			},

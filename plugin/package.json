@@ -7,28 +7,37 @@
 		"clean": "rm -rf node_modules"
 	},
 	"dependencies": {
-		"hono": "catalog:",
-		"@hono/node-server": "catalog:",
-		"fast-glob": "catalog:",
-		"magic-string": "catalog:",
-		"ofetch": "catalog:"
+		"consola": "catalog:unjs",
+		"hono": "catalog:hono",
+		"magic-string": "catalog:unjs",
+		"pathe": "catalog:unjs",
+		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@types/bun": "catalog:",
-		"@types/node": "catalog:",
-		"typescript": "catalog:",
-		"@rsdoctor/rspack-plugin": "catalog:",
-		"cross-env": "^10.1.0"
+		"@rsdoctor/rspack-plugin": "catalog:rstack",
+		"@rslib/core": "catalog:rstack",
+		"@types/bun": "catalog:types",
+		"@types/node": "catalog:types",
+		"cross-env": "catalog:",
+		"typescript": "catalog:"
 	},
 	"peerDependencies": {
-		"@types/bun": "catalog:",
-		"@types/node": "catalog:",
+		"@types/bun": "catalog:types",
+		"@types/node": "catalog:types",
 		"typescript": "catalog:"
 	},
 	"peerDependenciesMeta": {
 		"typescript": {
 			"optional": false
 		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/payneusmc07/rsbuild-plugin-hydra.git",
+		"directory": "plugin"
 	},
 	"exports": {
 		".": {
@@ -42,6 +51,10 @@
 		"./env": {
 			"types": "./dist/env/index.d.ts",
 			"import": "./dist/env/index.js"
+		},
+		"./logger": {
+			"types": "./dist/logger/index.d.ts",
+			"import": "./dist/logger/index.js"
 		}
 	}
 }

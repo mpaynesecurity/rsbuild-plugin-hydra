@@ -1,11 +1,8 @@
-import { getRequestListener } from "@hono/node-server"
 import type { RsbuildPlugin } from "@rsbuild/core"
-import { glob } from "fast-glob"
+import { Context } from "hono"
 import MagicString from "magic-string"
-import { mkdir, readFile, writeFile, stat } from "node:fs/promises"
-import { dirname, extname, relative, resolve } from "node:path"
-import { pathToFileURL } from "node:url"
-import { type TranspileOutput } from "typescript"
+import { mkdir, readFile } from "node:fs/promises"
+import { dirname, extname, relative, resolve } from "pathe"
 
 interface PluginOptions {
 	/**
@@ -14,34 +11,15 @@ interface PluginOptions {
 	apiDirectory: string
 	/**
 	 * Where the auto-generated Hono routes file is places
-	 * @default src/api-routes.gen.ts
+	 * @default api-routes.gen.ts
 	 */
 	generatedRoutesFile?: string
-	/**
-	 * Location for the final build artifacts (css, js, etc)
-	 * @default dist
-	 */
-	buildArtifactsOutputDirectory?: string
-	/**
-	 * Name of the entry point for the production build
-	 * @default index.mjs
-	 */
-	completedBuildFileName?: string
-	/**
-	 * Path to Hono context file.
-	 * Will be created if it does not exist
-	 * @default src/api/ctx.ts
-	 */
-	contextFile?: string
 }
 
 export const hydra = (options: PluginOptions): RsbuildPlugin => {
-	const apiDir = options.apiDirectory
-	const generatedRoutesFile = options.generatedRoutesFile ?? "api.routes.ts"
-	const buildArtifactsOutputDirectory = options.buildArtifactsOutputDirectory ?? "dist"
-	const ctxFile = options.contextFile
+	const generatedRoutesFile = options.generatedRoutesFile || "api.routes.ts"
 	
-	const resolvedOutputPath = resolve(generatedRoutesFile)
+	const generatedRoutesFilePath = resolve(generatedRoutesFile)
 	
 	let isRouterFileWriting = false
 	
@@ -51,28 +29,20 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 		isRouterFileWriting = true
 		
 		try {
-			const files = await glob(`**/*.{ts,js}`, { cwd: resolve(apiDir) })
+			//const apiFiles = glob("**/*.{ts,js}", { cwd: resolve(options.apiDirectory) })
+			const apiGlobber = new Bun.Glob("**/*.{ts,js}")
+			const apiFiles = apiGlobber.scan({ cwd: resolve(options.apiDirectory) })
 			
-			const outputDir = dirname(resolvedOutputPath)
+			const generatedRoutesOutputDir = dirname(generatedRoutesFilePath)
 			
-			if( !ctxFile ) {
-				if( !await stat(ctxFile!) ) {
-					const ctx = new MagicString("export type Ctx = {}\n")
-					await writeFile(ctxFile!, ctx.toString())
-				}
-			}
-			console.info(`Using ${ options.contextFile } as Hono context`)
-			const codeLines = new MagicString("")
-				.append(`import { Hono } from "hono"\n`)
-				.append(`import { contextStorage } from "hono/context-storage"\n`)
-				.append(`import { type Ctx } from "./${ options.contextFile }"\n\n`)
-				.append(`export const app = new Hono<Ctx>().basePath("/api")\n\n`)
-				.append("app.use(contextStorage())\n")
+			const codeLines = new MagicString("").append(`import { Hono } from "hono"\nexport const app = new Hono().basePath("/api")\n`)
 			
-			files.forEach((file, index) => {
-				const namespaceName = `rawModule_${ index }`
-				const absoluteTarget = resolve(apiDir, file)
-				let relativePath = relative(outputDir, absoluteTarget).replace(/\\/g, "/")
+			for await ( const f of apiFiles ) {
+				const randomApiFileId = Bun.hash(f).toString(36).slice(0, 8)
+				const importNamespace = `route_${ randomApiFileId }`
+				
+				const absoluteTarget = resolve(options.apiDirectory, f)
+				let relativePath = relative(generatedRoutesOutputDir, absoluteTarget).replace(/\\/g, "/")
 				
 				if( !relativePath.startsWith(".") ) {
 					relativePath = `./${ relativePath }`
@@ -83,21 +53,22 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 					relativePath = relativePath.slice(0, -extName.length)
 				}
 				
-				// append the resolved namespace and relative path (file containing the Hono route
-				codeLines.append(`\nimport * as ${ namespaceName } from "${ relativePath }"\n`)
+				// append the resolved namespace and relative path (file containing the Hono route)
+				codeLines.append(`\nimport * as ${ importNamespace } from "${ relativePath }.ts"\n`)
 				
-				let urlPath = file.slice(0, -extname(file).length).replace(/\\/g, "/")
+				let urlPath = f.slice(0, -extname(f).length).replace(/\\/g, "/")
 				urlPath = urlPath.replace(/\[([^\]]+)\]/g, ":$1")
 				const cleanRoute = urlPath === "index" ? "/" : `/${ urlPath }`
 				
-				codeLines.append(`const untypedInstance_${ index }: any = ${ namespaceName }\n`)
-				         .append(`const subApp_${ index } = untypedInstance_${ index }.default || untypedInstance_${ index }.app || untypedInstance_${ index }\n`)
-				         .append(`if (subApp_${ index } && typeof subApp_${ index }.fetch === "function") {\n`)
-				         .append(`\tapp.route('${ cleanRoute }', subApp_${ index })\n}\n`)
-			})
+				codeLines.append(`if (${ importNamespace } && typeof ${ importNamespace }.default.fetch === "function") {\n`)
+				         .append(`\tapp.route("${ cleanRoute }", ${ importNamespace }.default)\n}\n`)
+			}
 			
-			await mkdir(outputDir, { recursive: true })
-			await writeFile(resolvedOutputPath, codeLines.toString())
+			await mkdir(generatedRoutesOutputDir, { recursive: true })
+			//await writeFile(generatedRoutesFilePath, codeLines.toString())
+			
+			await Bun.write(generatedRoutesFilePath, codeLines.toString())
+			
 		}
 		finally {
 			isRouterFileWriting = false
@@ -129,9 +100,7 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 					...existingWatchFiles,
 					{
 						type: "reload-server", // Forces a full native Node CLI process reboot
-						paths: [
-							`${ resolve(options.apiDirectory) }/**/*`,
-						],
+						paths: [ `${ resolve(options.apiDirectory) }/**/*` ],
 					},
 				]
 			})
@@ -146,96 +115,159 @@ export const hydra = (options: PluginOptions): RsbuildPlugin => {
 					const protocol = req.headers["x-forwarded-proto"] || "http"
 					const host = req.headers.host || "localhost"
 					
-					let rawUrl = req.originalUrl || req.url || ""
+					const rawUrl = req.originalUrl || req.url || ""
 					const parsedUrlContext = new URL(rawUrl, `${ protocol }://${ host }`)
 					
+					// 1. Fast path exit for standard static asset traffic
 					if( !parsedUrlContext.pathname.startsWith("/api") ) {
 						return next()
 					}
 					
 					try {
-						const fileUrl = pathToFileURL(resolvedOutputPath).href
+						const fileUrl = Bun.pathToFileURL(generatedRoutesFilePath).href
 						const cacheBustUrl = `${ fileUrl }?update=${ Date.now() }`
-						const { app } = await import(cacheBustUrl)
+						const importedModule = await import(cacheBustUrl)
 						
-						app.notFound((c: any) => c.json({ error: "Hono Dev 404: Route not matched", path: c.req.path }, 404))
+						const appInstance = importedModule?.app || importedModule?.default
 						
-						req.url = parsedUrlContext.pathname + parsedUrlContext.search
+						if( !appInstance || typeof appInstance.fetch !== "function" ) {
+							console.warn(`[Hydra] Could not resolve a valid Hono instance from ${ generatedRoutesFilePath }`)
+							return next()
+						}
 						
-						const nativeNodeHandler = getRequestListener(app.fetch)
-						await nativeNodeHandler(req, res)
+						if( typeof appInstance.notFound === "function" ) {
+							appInstance.notFound((c: Context) => c.json({ error: "Hono Dev 404: Route not matched", path: c.req.path }, 404))
+						}
+						
+						// 2. Convert incoming Node stream headers into a Web standard Headers object
+						const webHeaders = new Headers()
+						for( const [ key, value ] of Object.entries(req.headers) ) {
+							if( value === undefined ) continue
+							if( Array.isArray(value) ) {
+								value.forEach(v => webHeaders.append(key, v))
+							}
+							else {
+								webHeaders.set(key, value)
+							}
+						}
+						
+						// 3. Construct a standard Web API Request object out of the incoming Node metadata
+						const webRequest = new Request(parsedUrlContext.href, {
+							method: req.method,
+							headers: webHeaders,
+							// Cast through any to satisfy TypeScript's strict BodyInit constraints
+							body: [ "GET", "HEAD" ].includes(req.method || "") ? undefined : (req as any),
+						})
+						
+						// 4. Fire the request directly into Hono's agnostic fetch pipeline
+						const webResponse: Response = await appInstance.fetch(webRequest)
+						
+						// 5. Pipe the standard Web Response properties back into the outgoing Node network socket
+						res.statusCode = webResponse.status
+						
+						webResponse.headers.forEach((value, key) => {
+							res.setHeader(key, value)
+						})
+						
+						// Stream the body chunks back out to the browser
+						if( webResponse.body ) {
+							const reader = webResponse.body.getReader()
+							while( true ) {
+								const { done, value } = await reader.read()
+								if( done ) break
+								res.write(value)
+							}
+						}
+						
+						res.end()
 					}
 					catch( error ) {
 						next(error)
 					}
 				})
+				
 			})
-			
 			// --- 4. PRODUCTION DICTIONARY EMISSION PASS ---
 			api.onAfterBuild(async () => {
-				const prodDistPath = resolve(api.context.distPath || buildArtifactsOutputDirectory)
-				const serverOutputFile = resolve(prodDistPath, options.completedBuildFileName ?? "server.mjs")
+				const prodDistPath = resolve(api.context.distPath)
+				const serverOutputFile = resolve(prodDistPath, "index.mjs")
 				
-				// Scan and pull EVERY single produced client asset file inside dist recursively
-				const allClientAssets = await glob("**/*", { cwd: prodDistPath, onlyFiles: true })
+				// Scan and pull EVERY single produced client asset file inside dist
+				//const assetsGlob = glob("**/*", { cwd: prodDistPath })
+				const assetsGlob = new Bun.Glob("**/*")
+				
+				const scannedAssets = assetsGlob.scan({ cwd: prodDistPath })
 				
 				const assetPayloadDictionary = new MagicString("{\n")
 				
 				let rootHtmlBase64 = new MagicString("").toString()
 				
-				for( const assetFile of allClientAssets ) {
+				for await ( const assetFile of scannedAssets ) {
 					// Ignore the output server destination name to avoid recursive readings
-					if( assetFile === (options.completedBuildFileName ?? "index.mjs") ) {
+					if( assetFile === "index.mjs" ) {
 						continue
 					}
 					
 					const absoluteAssetPath = resolve(prodDistPath, assetFile)
+					/**
+					 * NOTE:
+					 *
+					 * Bun.file(absoluteAssetPath).text()
+					 * does not work because Bun.file().text() returns a standard JavaScript primitive string, not a Node.js Buffer object.
+					 *
+					 * Primitive JavaScript strings do not have a .toString("base64") method.
+					 * When you call it, JavaScript either throws a TypeError or ignores the "base64"
+					 * argument and just returns the original text.
+					 */
 					const rawBuffer = await readFile(absoluteAssetPath)
+					
 					const base64String = rawBuffer.toString("base64")
 					const normalizedPath = `/${ assetFile.replace(/\\/g, "/") }`
 					
 					if( assetFile === "index.html" ) {
 						rootHtmlBase64 = base64String
 					}
+					
 					assetPayloadDictionary.append(`"${ normalizedPath }": "${ base64String }",\n`)
 				}
 				assetPayloadDictionary.append("}")
 				
-				// Transpile and copy the API files into the dist folder using typescript utilities
-				const ts = await import("typescript")
-				const files = await glob(`**/*.{ts,js}`, { cwd: apiDir })
+				// Transpile and copy the API files into the dist folder
+				//const distFilesGlob = await glob(`**/*.{ts,js}`, { cwd: options.apiDirectory })
+				const distFilesGlob = new Bun.Glob("**/*.{ts,js}").scan({ cwd: options.apiDirectory })
 				
-				const productionImportsBlock = new MagicString("")
-				const productionMountsBlock = new MagicString("")
+				// Placeholder for injected production Hono routes
+				const productionImports = new MagicString("")
 				
-				for( let i = 0; i < files.length; i++ ) {
-					const file = files[i]
-					const rawCodeText = await readFile(resolve(apiDir, file), "utf-8")
+				const productionRoutes = new MagicString("")
+				
+				const transpiler = new Bun.Transpiler({ loader: "ts", allowBunRuntime: true })
+				
+				for await ( const f of distFilesGlob ) {
+					//const rawCodeText = await readFile(resolve(options.apiDirectory, f), "utf-8")
+					const rawCodeText = await Bun.file(resolve(options.apiDirectory, f)).text()
 					
-					const transpiledResult: TranspileOutput = ts.default.transpileModule(rawCodeText, {
-						compilerOptions: {
-							target: ts.default.ScriptTarget.ES2024,
-							module: ts.default.ModuleKind.ESNext,
-						},
-					})
+					const transpiledResult = await transpiler.transform(rawCodeText)
 					
-					const cleanFilePath = file.replace(/\\/g, "/").replace(/\.ts$/, ".js")
+					const cleanFilePath = f.replace(/\\/g, "/").replace(/\.ts$/, ".js")
 					
 					const outputTargetFile = resolve(prodDistPath, "api-source", cleanFilePath)
 					
 					await mkdir(dirname(outputTargetFile), { recursive: true })
 					
-					await writeFile(outputTargetFile, transpiledResult.outputText)
-					
-					let routeUrlPath = file.slice(0, -extname(file).length).replace(/\\/g, "/")
+					//await writeFile(outputTargetFile, transpiledResult)
+					await Bun.write(outputTargetFile, transpiledResult)
+					let routeUrlPath = f.slice(0, -extname(f).length).replace(/\\/g, "/")
 					
 					routeUrlPath = routeUrlPath.replace(/\[([^\]]+)\]/g, ":$1")
 					
 					const cleanRoute = routeUrlPath === "index" ? "/" : `/${ routeUrlPath }`
 					
-					productionMountsBlock.append(`import * as m${ i } from "./api-source/${ cleanFilePath }"\n`)
-					                     .append(`const a${ i } = m${ i }?.app || m${ i }.default || m${ i }\n`)
-					                     .append(`if (a${ i } && typeof a${ i }.fetch === "function") app.route('${ cleanRoute }', a${ i })\n\n`)
+					const randomID = Bun.hash(f).toString(36).slice(0, 8)
+					
+					productionRoutes.append(`import * as m_${ randomID } from "./api-source/${ cleanFilePath }"\n`)
+					                .append(`if (m_${ randomID } && typeof m_${ randomID }.default.fetch === "function") {\n`)
+					                .append(`\tapp.route("${ cleanRoute }", m_${ randomID }.default)\n}\n\n`)
 				}
 				
 				// Assemble the final server module string containing the full asset lookup map
@@ -244,33 +276,33 @@ import { Hono } from "hono"
 
 export const app = new Hono().basePath("/api")
 
-${ productionImportsBlock }
+${ productionImports }
 
-${ productionMountsBlock }
-
+${ productionRoutes }
 // Statically compiled Base64 binary asset map mapping paths to code bodies
-const hydraStaticAssets = ${ assetPayloadDictionary }
+const staticAssets = ${ assetPayloadDictionary }
+
 const DEFAULT_HTML_BASE64 = "${ rootHtmlBase64 }"
 
 // Automated MIME Type lookup utility
 const getMimeType = (pathname) => {
-  if (pathname.endsWith(".js")) return "application/javascript; charset=utf-8"
-  if (pathname.endsWith(".css")) return "text/css; charset=utf-8"
-  if (pathname.endsWith(".html")) return "text/html; charset=utf-8"
-  if (pathname.endsWith(".png")) return "image/png"
-  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) return "image/jpeg"
-  if (pathname.endsWith(".svg")) return "image/svg+xml"
-  if (pathname.endsWith(".ico")) return "image/x-icon"
-  return "application/octet-stream"
+	if (pathname.endsWith(".js")) return "application/javascript; charset=utf-8"
+    if (pathname.endsWith(".css")) return "text/css; charset=utf-8"
+    if (pathname.endsWith(".html")) return "text/html; charset=utf-8"
+    if (pathname.endsWith(".png")) return "image/png"
+    if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) return "image/jpeg"
+    if (pathname.endsWith(".svg")) return "image/svg+xml"
+    if (pathname.endsWith(".ico")) return "image/x-icon"
+	return "application/octet-stream"
 }
 
 // Convert Base64 strings to Uint8Array safely for V8 isolate environments without Node.js Buffer
 const base64ToUint8 = (base64) => {
-  return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+	return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
 }
 
 // Production entry point
-export default {
+const serverEngine = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
 
@@ -280,8 +312,8 @@ export default {
     }
 
     // Serve ANY asset dynamically from Base64 dictionary map with the correct content type
-    if (hydraStaticAssets[url.pathname] !== undefined) {
-      return new Response(base64ToUint8(hydraStaticAssets[url.pathname]), {
+    if (staticAssets[url.pathname] !== undefined) {
+      return new Response(base64ToUint8(staticAssets[url.pathname]), {
         headers: { "Content-Type": getMimeType(url.pathname) }
       })
     }
@@ -292,10 +324,12 @@ export default {
     })
   }
 }
+export default serverEngine
 `).toString()
 				
-				await writeFile(serverOutputFile, finalServerCode)
-				console.log(`\n${ options.completedBuildFileName ?? "index.mjs" } build generated at: ${ prodDistPath }\n`)
+				await Bun.write(serverOutputFile, finalServerCode)
+				console.info(`\nBuild generated at: ${ prodDistPath }\n`)
+				
 			})
 		},
 	}

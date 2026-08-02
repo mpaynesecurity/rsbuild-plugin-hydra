@@ -1,36 +1,18 @@
-import {
-	type InferOutput,
-	type ObjectEntries,
-	type ObjectSchema,
-	isValiError,
-	parse,
-} from "valibot"
+import { z } from "zod"
 
 /**
- *
+ * Validates system environment variables against a dynamic runtime schema
+ * @param schema A Zod validation schema object
+ * @returns Fully parsed and typed environment properties
  */
-type GenericObjectSchema = ObjectSchema<ObjectEntries, undefined>
-
-/**
- *
- */
-export class TypedEnv<TSchema extends GenericObjectSchema> {
-	// This automatically holds the inferred runtime structure of whatever schema is passed in
-	public readonly data: InferOutput<TSchema>
+export const validateEnv = <SchemaShape extends z.ZodRawShape>(
+	schema: z.ZodObject<SchemaShape>,
+): z.infer<z.ZodObject<SchemaShape>> => {
+	// Gracefully fall back to global contexts across Node, Bun, Vite, or Next.js
+	const rawEnv = typeof process !== "undefined" && process.env
+	               ? process.env
+	               : (import.meta as any).env ?? {}
 	
-	constructor(schema: TSchema) {
-		try {
-			this.data = parse(schema, process.env)
-		}
-		catch( error ) {
-			if( isValiError(error) ) {
-				console.error("❌ Missing or invalid environment configuration fields:")
-				for( const issue of error.issues ) {
-					const path = issue.path?.map((p) => p.key).join(".")
-					console.error(`   - [${ path }]: ${ issue.message }`)
-				}
-			}
-			process.exit(1)
-		}
-	}
+	// Executes parsing instantly; crashes the runtime if constraints fail
+	return schema.parse(rawEnv)
 }

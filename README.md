@@ -29,9 +29,8 @@ import { hydra } from "@mpaynesecurity/hydra"
 export default defineConfig({
 	plugins: [
 		hydra({
-			apiDirectory: "/path/to/api",
+			apiDirectory: "/path/to/api-directory",
 			generatedRoutesFile: "/path/to/folder/filename.ts",
-			completedBuildFileName: "index.mjs",
 		})
 	]
 })
@@ -53,19 +52,33 @@ app.get("/", (c) => {
 export default app
 ```
 
-### Run the dev server
+### Run the server
 
 #### NOTE: HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
 
 ```bash
 # HMR will not work
-bunx --bun rsbuild
+bun --bun rsbuild
 ```
 
-#### Use the standard Node runtime instead.
+#### There are two workarounds
+
+#### 1. Use the standard Node runtime instead.
 
 ```bash
 rsbuild
+```
+
+#### 2. Upgrade Bun to the `canary` version
+
+```bash
+bun upgrade --canary
+```
+
+then run
+
+```bash
+bun --bun rsbuild
 ```
 
 ## Production build
@@ -73,12 +86,12 @@ rsbuild
 Build the app for production:
 
 ```bash
-bun run build
+bun --bun rsbuild build
 ```
 
 ## Preview using Bun runtime
 
-Preview the production build using your locally installed Bun runtime:
+Preview the production build using the Bun runtime:
 
 ```bash
 bun dist/index.mjs
@@ -94,4 +107,7 @@ wrangler dev
 
 ## Caveats
 
+- Hydra is ESM only
+- As I am not in a financial position to have multiple providers, Hydra has only been production tested on Cloudflare
+  via Wrangler
 
