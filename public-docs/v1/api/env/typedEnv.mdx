@@ -7,7 +7,8 @@ title: TypedEnv
 type GenericObjectSchema = ObjectSchema<ObjectEntries, undefined>
 ```
 
-### Options
+### Types
+#### TypedEnv
 ```ts
 class TypedEnv<TSchema extends GenericObjectSchema>{}
 ```
@@ -19,4 +20,6 @@ import { TypedEnv } from "@mpaynesecurity/rsbuild-plugin-hydra/env"
 export const env = new TypedEnv(object({
 	PORT: pipe(string(), transform((val) => parseInt(val, 10)), number()),
 }))
+
+console.info(env.PORT)
 ```

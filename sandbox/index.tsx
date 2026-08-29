@@ -1,25 +1,11 @@
-import { type RouteDefinition, Router } from "@solidjs/router"
-import { lazy } from "solid-js"
+import { Router } from "@solidjs/router"
 import { render } from "solid-js/web"
 import "./styles.css"
 import { NavbarLayout } from "@/layouts"
-
-const routes = [
-	{
-		path: "/",
-		component: lazy(() => import("./pages/index.tsx")),
-	},
-	{
-		path: "/context",
-		component: lazy(() => import("./pages/context.tsx")),
-	},
-	{
-		path: "/scalar",
-		component: lazy(() => import("./pages/scalar.tsx")),
-	},
-] satisfies RouteDefinition[]
+import { navRoutes } from "@/types"
 
 const root = document.getElementById("root")
-if( root ) {
-	render(() => <Router root={ NavbarLayout }>{ routes }</Router>, root)
+
+if(root) {
+	render(() => <Router root={NavbarLayout}>{navRoutes}</Router>, root)
 }

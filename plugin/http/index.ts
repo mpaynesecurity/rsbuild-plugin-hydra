@@ -2,6 +2,7 @@
  * @module HTTP Collection of http related helper functions and utilities
  */
 import { type Hono } from "hono"
+
 import { hc, type ClientRequestOptions } from "hono/client"
 
 /**
@@ -27,9 +28,24 @@ export interface RpcClientOptions {
 	honoOptions?: ClientRequestOptions
 }
 
-
 /**
  * Small wrapper around the Hono RPC Client
+ * @example
+ * ```ts
+ * import { useRpcClient } from "@mpaynesecurity/rsbuild-plugin-hydra/http"
+ *
+ * const client = useRpcClient<AppType>({
+ * 	host: "http://localhost",
+ * 	port: 3000,
+ * 	prefix: "/api/users",
+ * })
+ *
+ * const response = await client.index.$get()
+ *
+ * if(response.ok) {
+ * 	return await response.json()
+ *}
+ * ```
  * @param config
  * @returns {RpcClient}
  * @see RpcClient
@@ -41,17 +57,17 @@ export const useRpcClient = <T extends Hono>(config: RpcClientOptions): RpcClien
 	 * Use the native URL API to clean up formatting automatically.
 	 * This handles missing protocols, trailing slashes, and edge cases
 	 */
-	const rawHost = config.host.startsWith("http") ? config.host : `https://${ config.host }`
+	const rawHost = config.host.startsWith("http") ? config.host : `https://${config.host}`
 	const urlObj = new URL(rawHost)
 	
 	// Inject custom port
-	if( config.port ) {
+	if(config.port) {
 		urlObj.port = config.port.toString()
 	}
 	
 	/** Combine host/port with path prefix. urlObj.origin handles the protocol + host + port calculation */
-	const cleanPrefix = pathPrefix.startsWith("/") ? pathPrefix : `/${ pathPrefix }`
-	const fullTargetUrl = `${ urlObj.origin }${ cleanPrefix }`
+	const cleanPrefix = pathPrefix.startsWith("/") ? pathPrefix : `/${pathPrefix}`
+	const fullTargetUrl = `${urlObj.origin}${cleanPrefix}`
 	
 	/** Build and return the client */
 	return hc<T>(fullTargetUrl, config.honoOptions)

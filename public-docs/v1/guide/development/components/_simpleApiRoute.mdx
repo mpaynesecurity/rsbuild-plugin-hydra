@@ -1,0 +1,12 @@
+import { CodeBlockRuntime } from "@rspress/core/theme"
+
+
+<CodeBlockRuntime
+	lang="ts"
+	title="simple.ts"
+	code={`import { Hono } from "hono"
+
+const app = new Hono().get("/", return c.text('Hi from my API route'))
+
+export default app
+`} />

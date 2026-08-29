@@ -1,3 +1,5 @@
+[//]: # (@formatter:off)
+
 # Introduction
 
 Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app into a lightweight fullstack framework.
@@ -28,12 +30,12 @@ import { defineConfig } from "@rsbuild/core"
 import { hydra } from "@mpaynesecurity/hydra"
 
 export default defineConfig({
-	plugins: [
-		hydra({
-			apiDirectory: "sandbox/api",
-			routesFile: "sandbox/api-routes.gen.ts",
-		}),
-	]
+plugins: [
+    hydra({
+        apiDirectory: "sandbox/api",
+        routesFile: "sandbox/api-routes.gen.ts",
+    }),
+  ]
 })
 ```
 
@@ -45,7 +47,7 @@ export default defineConfig({
 import { Hono } from "hono"
 
 const app = new Hono().get("/", (c) => {
-	return c.json({message: "IT WORKED"})
+    return c.json({message: "IT WORKED"})
 })
 
 export default app

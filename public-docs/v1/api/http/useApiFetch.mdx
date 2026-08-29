@@ -1,20 +1,76 @@
 ---
-title: UseApiFetch
+title: UseRpcClient
 ---
+
+import { CodeBlockRuntime } from "@rspress/core/theme"
 
 ### Function
 ```ts
-useApiFetch: (options: FetchOptions) => $Fetch
+/**
+ * Small wrapper around the Hono RPC Client
+ * @param config
+ * @returns {RpcClient}
+ * @see RpcClient
+ */
+export const useRpcClient = <T extends Hono>(config: RpcClientOptions): RpcClient<T> => {}
 ```
 
-### Options
+### Types
+#### RpcClient
 ```ts
-interface IOptions {
-	baseUrl?: string
-	port?: number | string
+import { type Hono } from "hono"
+
+import { hc, type ClientRequestOptions } from "hono/client"
+
+export type RpcClient<T extends Hono> = ReturnType<typeof hc<T>>
+````
+#### RpcClientOptions
+```ts
+import { type ClientRequestOptions } from "hono/client"
+
+export interface RpcClientOptions {
+	/** The base domain or IP (e.g., 'https://my-app.com', 'localhost') */
+	host: string
+	/** Optional override if the app runs on a non-standard port */
+	port: number | string
+	/**
+	 * Custom url path prefix such as "/api/v1"
+	 * */
+	prefix: string
+	/** Standard Hono client configuration (custom fetch, headers, etc.) */
+	honoOptions?: ClientRequestOptions
 }
+
 ```
 
 ### Examples
-```ts
-```
+<CodeBlockRuntime
+	lang="ts"
+	title="my-route.ts"
+	code={`import { Hono } from "hono"
+
+const app = new Hono().get("/", return c.json({
+	message: "Hi from my API route"
+}))
+
+export default app`} />
+
+<CodeBlockRuntime
+	lang="ts"
+	title="my-route.ts"
+	code={`import { useRpcClient } from "@mpaynesecurity/rsbuild-plugin-hydra/http"
+import { type AppType } from "./app-type.ts"
+
+const client = useRpcClient<AppType>({
+		host: "http://localhost",
+		port: 3000,
+		prefix: "/api/my-route",
+})
+
+const response = await client.index.$get()
+
+if(response.ok) {
+		return await response.json()
+}
+`}
+/>

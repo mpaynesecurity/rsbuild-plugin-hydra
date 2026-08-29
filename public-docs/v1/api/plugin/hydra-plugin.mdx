@@ -1,6 +1,5 @@
----
-title: Hydra
----
+import { CodeBlockRuntime } from "@rspress/core/theme"
+import { transformerNotationHighlight } from "@shikijs/transformers"
 
 ### Function
 ```ts
@@ -11,33 +10,37 @@ const hydra = (options: PluginOptions): RsbuildPlugin => {}
 ```ts
 interface PluginOptions {
 	/**
-	 * Path where Hono api routes are stored
+	 * Path to Hono api routes folder
 	 */
 	apiDirectory: string
+
 	/**
-	 * Where the auto-generated Hono routes file is places
-	 * @default src/api-routes.gen.ts
-	 */
-	generatedRoutesFile?: string
-	/**
-	 * Location for the final build artifacts (css, js, etc)
-	 * @default dist
-	 */
-	buildArtifactsOutputDirectory?: string
-	/**
-	 * Name of the entry point for the production build
-	 * @default index.mjs
-	 */
-	completedBuildFileName?: string
-	/**
-	 * Path to Hono context file.
-	 * Will be created if it does not exist
-	 * @default src/api/ctx.ts
-	 */
-	contextFile?: string
+	 * Where the file containing the Hono routes will be placed
+	 * */
+	routesFile: string
 }
 ```
 
 ### Examples
-```ts
+```text
+root/
+├── src/
+│   ├── api/
+│   │   ├── route01.ts
+│   │   └── route02.ts
+├── api-routes.gen.ts
+├── rsbuild.config.ts
+└── package.json
 ```
+
+<CodeBlockRuntime
+	lang="ts"
+	title="rsbuild.config.ts"
+	shikiOptions={{
+		transformers: [ transformerNotationHighlight() ],
+	}}
+	code={`hydra({
+		apiDirectory: " src/api", // [!code highlight]
+		routesFile: " src/api-routes.gen.ts", // [!code highlight]
+	})`}
+/>

@@ -5,21 +5,27 @@
 	"scripts": {
 		"clean": "rm -rf node_modules"
 	},
-	"dependencies": {
-		"hono": "catalog:",
-		"@valibot/to-json-schema": "catalog:",
-		"valibot": "catalog:",
-		"hono-openapi": "catalog:",
-		"@scalar/hono-api-reference": "catalog:",
-		"@hono/structured-logger": "catalog:",
-		"pino": "catalog:",
-		"@scalar/api-reference": "^1.63.0"
-	},
 	"devDependencies": {
-		"@types/bun": "catalog:",
-		"@types/node": "catalog:",
-		"jsdom": "catalog:",
-		"@solidjs/router": "catalog:",
-		"solid-js": "catalog:"
+		"@hono/zod-validator": "catalog:hono",
+		"@hono/structured-logger": "catalog:hono",
+		"@rsdoctor/rspack-plugin": "catalog:rstack",
+		"@types/bun": "catalog:types",
+		"@types/node": "catalog:types",
+		"pino": "catalog:",
+		"zod": "catalog:",
+		"cross-env": "catalog:"
+	},
+	"peerDependencies": {
+		"@types/bun": "catalog:types",
+		"@types/node": "catalog:types",
+		"typescript": "catalog:",
+		"solid-js": "catalog:",
+		"hono": "catalog:hono",
+		"@solidjs/router": "catalog:"
+	},
+	"peerDependenciesMeta": {
+		"typescript": {
+			"optional": false
+		}
 	}
 }

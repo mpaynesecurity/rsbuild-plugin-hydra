@@ -1,0 +1,22 @@
+{
+	"$schema": "https://raw.githubusercontent.com/rawtoast/bun-scan/v1.1.0/schema/bun-scan.schema.json",
+	"source": "osv",
+	"bunReportWarnings": true,
+	"osv": {
+		"apiBaseUrl": "https://api.osv.dev/v1",
+		"timeoutMs": 30000,
+		"disableBatch": false
+	},
+	"npm": {
+		"registryUrl": "https://registry.npmjs.org",
+		"timeoutMs": 30000
+	},
+	"packages": {
+		"react-router": {
+			"vulnerabilities": [
+				"GHSA-qwww-vcr4-c8h2"
+			],
+			"reason": "This project does not use RSC"
+		}
+	}
+}

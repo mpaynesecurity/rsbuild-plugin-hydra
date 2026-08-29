@@ -5,8 +5,6 @@ import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
 import { hydra } from "@mpaynesecurity/rsbuild-plugin-hydra"
 import { env } from "./validate-env"
 
-
-// Docs: https://rsbuild.rs/config/
 export default defineConfig({
 	plugins: [
 		pluginBabel({
@@ -16,13 +14,14 @@ export default defineConfig({
 		pluginTailwindcss(),
 		hydra({
 			apiDirectory: "sandbox/api",
-			generatedRoutesFile: "sandbox/api-routes.gen.ts",
-			completedBuildFileName: "index.mjs",
-			contextFile: "context.ts",
+			routesFile: "sandbox/api-routes.gen.ts",
 		}),
 	],
-	output: {
-		minify: true,
+	dev: {
+		browserLogs: {
+			stackTrace: "none",
+		},
+		lazyCompilation: true,
 	},
 	tools: {
 		htmlPlugin: {
@@ -31,6 +30,21 @@ export default defineConfig({
 		lightningcssLoader: {
 			minify: true,
 		},
+		swc: {
+			module: {
+				type: "nodenext",
+			},
+		},
+		rspack: {
+			watchOptions: {
+				/*
+				 Bun's native file watcher (FSWatcher) in canary can occasionally
+				 exhibit memory growth when watching deep node_modules trees.
+				 This explicitly restricts the watcher scope
+				 */
+				ignored: /node_modules/,
+			},
+		},
 	},
 	source: {
 		entry: {
@@ -38,7 +52,7 @@ export default defineConfig({
 		},
 	},
 	server: {
-		port: env.data.PORT,
+		port: env.PORT,
 		publicDir: false,
 	},
 })

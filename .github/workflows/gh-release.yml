@@ -1,0 +1,40 @@
+name: Create Github Package
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  publish-ghithub-pkg:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          registry-url: https://npm.pkg.github.com/
+          # 1. CRITICAL: Add your scope here so Bun doesn't route public packages to GitHub!
+          scope: "@mpaynesecurity"
+
+      # 2. Run from the root so Bun installs public dependencies from npmjs.org
+      # while cleanly mapping the local workspaces.
+      - name: Install Monorepo Dependencies
+        run: bun install --frozen-lockfile
+        env:
+          BUN_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+      - name: Bump Version
+        run: bun pm version patch --no-git-tag-version --force
+
+      # 3. Publish out of your specific workspace folder
+      - name: Publish Package
+        run: bun publish --dry-run
+        working-directory: ./plugin
+        env:
+          BUN_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}

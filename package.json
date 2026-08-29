@@ -1,20 +1,24 @@
 {
-	"version": "1.0.0",
 	"private": true,
 	"type": "module",
-	"packageManager": "bun@1.4.0",
 	"scripts": {
 		"init": "bun install",
-		"clean": "rm bun.lock && rm -rf node_modules && bun run --filter '*' clean",
+		"clean:artifacts": "rm -rf .wrangler && rm -rf dist",
+		"clean:deps": "rm bun.lock && rm -rf node_modules && bun run --filter '*' clean",
 		"docs:dev": "bun run --elide-lines=0 --filter 'pkg-docs' dev",
 		"docs:build": "bun run --elide-lines=0 --filter 'pkg-docs' build",
-		"sandbox:dev": "bun --bun rsbuild",
+		"sandbox:dev:bun": "bun --bun rsbuild",
 		"sandbox:build": "bun --bun rsbuild build",
 		"sandbox:build:rsdoctor": "RSDOCTOR=true bun --bun rsbuild build",
 		"plugin:build": "bun run --elide-lines=0 --filter '*/rsbuild-plugin-hydra' build && bun i",
 		"plugin:build:rsdoctor": "bun run --elide-lines=0 --filter '*/rsbuild-plugin-hydra' build:rsdoctor",
-		"preview:cf": "wrangler dev",
-		"preview:bun": "bun dist/index.mjs"
+		"preview:build": "bun run plugin:build && bun run sandbox:build && bun run preview:bun",
+		"preview:bun": "bun dist/index.mjs",
+		"preview:cf": "wrangler dev"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mpaynesecurity/rsbuild-plugin-hydra.git"
 	},
 	"workspaces": {
 		"packages": [
@@ -25,6 +29,7 @@
 		"catalog": {
 			"@solidjs/router": "^0.16.1",
 			"cross-env": "^10.1.0",
+			"magic-string": "^1.1.0",
 			"pino": "^10.3.1",
 			"solid-js": "^1.9.14",
 			"typescript": "^6.0.3",
@@ -33,14 +38,11 @@
 		"catalogs": {
 			"hono": {
 				"@hono/structured-logger": "^0.1.0",
-				"@hono/valibot-validator": "^0.6.1",
-				"@hono/standard-validator": "^0.3.0",
-				"@scalar/hono-api-reference": "^0.11.9",
 				"hono": "^4.12.29",
-				"hono-openapi": "^1.3.1"
+				"@hono/zod-validator": "^0.9.0"
 			},
 			"rstack": {
-				"@rsbuild/core": "^2.1.8",
+				"@rsbuild/core": "^2.2.1",
 				"@rsbuild/plugin-babel": "^2.0.1",
 				"@rsbuild/plugin-solid": "^1.2.2",
 				"@rsbuild/plugin-tailwindcss": "^2.0.3",
@@ -51,51 +53,41 @@
 				"react": "^19.2.7",
 				"react-dom": "^19.2.7"
 			},
-			"unjs": {
-				"magic-string": "^0.30.21",
-				"pathe": "^2.0.3",
-				"std-env": "^4.2.0",
-				"consola": "^3.4.2"
-			},
 			"types": {
 				"@types/react": "^19.2.17",
 				"@types/react-dom": "^19.2.3",
 				"@types/bun": "^1.3.14",
-				"@types/node": "^26.1.1",
-				"openapi-types": "^12.1.3"
+				"@types/node": "^26.1.1"
 			}
 		}
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/payneusmc07/rsbuild-plugin-hydra.git"
-	},
 	"dependencies": {
+		"@hono/zod-validator": "catalog:hono",
 		"@mpaynesecurity/rsbuild-plugin-hydra": "workspace:*",
-		"@hono/valibot-validator": "catalog:hono",
-		"@scalar/hono-api-reference": "catalog:hono",
-		"hono": "catalog:hono",
-		"openapi-types": "catalog:types",
-		"hono-openapi": "catalog:hono",
-		"zod": "catalog:"
+		"magic-string": "catalog:"
 	},
 	"devDependencies": {
 		"@rsbuild/core": "catalog:rstack",
 		"@rsbuild/plugin-babel": "catalog:rstack",
-		"@rsbuild/plugin-tailwindcss": "catalog:rstack",
 		"@rsbuild/plugin-solid": "catalog:rstack",
+		"@rsbuild/plugin-tailwindcss": "catalog:rstack",
 		"@rsdoctor/rspack-plugin": "catalog:rstack",
 		"@types/bun": "catalog:types",
 		"@types/node": "catalog:types",
-		"solid-js": "catalog:",
+		"bun-scan": "^1.1.2",
+		"cross-env": "catalog:",
 		"tailwindcss": "^4.3.1",
 		"typescript": "catalog:",
-		"wrangler": "^4.114.0",
-		"cross-env": "catalog:"
+		"wrangler": "^4.114.0"
 	},
 	"peerDependencies": {
 		"@types/bun": "catalog:types",
 		"@types/node": "catalog:types",
-		"typescript": "catalog:"
-	}
+		"typescript": "catalog:",
+		"solid-js": "catalog:",
+		"@solidjs/router": "catalog:",
+		"hono": "catalog:hono",
+		"zod": "catalog:"
+	},
+	"version": "0.0.1"
 }

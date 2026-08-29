@@ -1,0 +1,4 @@
+loglevel = "error"
+
+#[install.security]
+#scanner = "bun-scan"

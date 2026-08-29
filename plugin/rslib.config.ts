@@ -7,16 +7,6 @@ export default defineConfig({
 			format: "esm",
 			syntax: "esnext",
 			id: "rsbuild-plugin-hydra",
-			output: {
-				minify: {
-					jsOptions: {
-						minimizerOptions: {
-							mangle: false,
-							minify: true,
-						},
-					},
-				},
-			},
 			dts: {
 				isolated: true,
 			},
@@ -26,31 +16,36 @@ export default defineConfig({
 		autoExternal: true,
 		cleanDistPath: true,
 		// Do not bundle dev dependencies
-		externals: [ ...Object.keys(pkg.devDependencies) ],
+		externals: [...Object.keys(pkg.devDependencies)],
 		// Inlines legal notices; stops *.LICENSE.txt sidecars
 		legalComments: "inline",
-		minify: {
-			jsOptions: {
-				minimizerOptions: {
-					// maintain function names
-					mangle: {
-						keep_classnames: true,
-						keep_fnames: true,
-					},
-					compress: {},
-				},
-			},
-		},
 		module: true,
 		sourceMap: false,
 		target: "node",
+		minify: {
+			jsOptions: {
+				minimizerOptions: {
+					mangle: false,
+					minify: true,
+					compress: {
+						// Required to keep placeholders for dynamically injected routes/assets
+						defaults: false,
+					},
+					// Required to keep placeholders for dynamically injected routes/assets
+					format: {
+						comments: "some",
+						preserve_annotations: true,
+					},
+				},
+			},
+		},
 	},
 	source: {
 		entry: {
 			"index": "index.ts",
+			"serverEngine": "./serverEngine.ts",
 			"http/index": "./http/index.ts",
 			"env/index": "./env/index.ts",
-			"logger/index": "./logger/index.ts",
 		},
 	},
 	tools: {

@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
 		"isolatedModules": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"allowJs": true
 	},
 	"extends": [
 		"../tsconfig.json"

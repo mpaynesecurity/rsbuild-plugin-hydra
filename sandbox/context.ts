@@ -1,12 +1,8 @@
-import pino from "pino"
-
-export const baseLogger = pino({
-	level: "error",
-})
+import { type Logger } from "pino"
 
 export type Ctx = {
 	Variables: {
 		message: string
-		logger: pino.Logger
+		logger: Logger
 	}
 }

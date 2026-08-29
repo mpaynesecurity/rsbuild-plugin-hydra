@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"lib": [
 			"DOM",
-			"ES2020"
+			"ESNext"
 		],
 		"target": "esnext",
 		"module": "esnext",
@@ -22,10 +22,13 @@
 		"allowImportingTsExtensions": true,
 		/* type checking */
 		"noUnusedLocals": false,
+		"isolatedModules": true,
 		"noUnusedParameters": true,
+		// Path aliases MUST be in the root tsconfig or the IDE loses it's mind
 		"paths": {
-			"@/components": ["./sandbox/components/index.ts"],
-			"@/layouts": ["./sandbox/layouts/index.ts"]
+			"@/*": [
+				"./sandbox/*"
+			],
 		}
 	}
 }

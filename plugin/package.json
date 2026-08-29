@@ -1,19 +1,21 @@
 {
 	"name": "@mpaynesecurity/rsbuild-plugin-hydra",
+	"version": "1.0.1",
 	"type": "module",
 	"scripts": {
 		"build:rsdoctor": "cross-env RSDOCTOR=true rslib",
-		"build": "rslib",
-		"clean": "rm -rf node_modules"
+		"build": "NODE_ENV=development rslib",
+		"clean": "rm -rf node_modules",
+		"publish:staged": "npm stage publish",
+		"publish:git": "npm publish --registry=https://npm.pkg.github.com"
 	},
 	"dependencies": {
-		"consola": "catalog:unjs",
 		"hono": "catalog:hono",
-		"magic-string": "catalog:unjs",
-		"pathe": "catalog:unjs",
+		"magic-string": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^3.0.1",
 		"@rsdoctor/rspack-plugin": "catalog:rstack",
 		"@rslib/core": "catalog:rstack",
 		"@types/bun": "catalog:types",
@@ -51,10 +53,6 @@
 		"./env": {
 			"types": "./dist/env/index.d.ts",
 			"import": "./dist/env/index.js"
-		},
-		"./logger": {
-			"types": "./dist/logger/index.d.ts",
-			"import": "./dist/logger/index.js"
 		}
 	}
 }
