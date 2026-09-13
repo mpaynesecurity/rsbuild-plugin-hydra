@@ -22,7 +22,7 @@ Rsbuild-plugin-hydra has multiple heads, each one representing a Hono API route.
 3) **UI Agnostic:** Works with any front-end framework supported by Rsbuild.
 4) **Cloud-agnostic:** Runs on any cloud provider which supports the browser native `fetch` as its default export.
 
-## Install the plugin
+## Add the plugin
 
 ```bash
 bun add @mpaynesecurity/rsbuild-plugin-hydra
