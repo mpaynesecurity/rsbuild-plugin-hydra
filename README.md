@@ -2,6 +2,13 @@
 
 Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app into a lightweight fullstack framework.
 
+![NPM License](https://img.shields.io/npm/l/%40mpaynesecurity%2Frsbuild-plugin-hydra)
+![npm package minimized gzipped size](https://img.shields.io/bundlejs/size/%40mpaynesecurity%2Frsbuild-plugin-hydra)
+![NPM Downloads](https://img.shields.io/npm/dm/%40mpaynesecurity%2Frsbuild-plugin-hydra)
+![GitHub Sponsors](https://img.shields.io/github/sponsors/mpaynesecurity)
+
+![https://ko-fi.com/s/c4e4fa35f8](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white&style=for-the-badge)
+
 ## What's in the name?
 
 The Hydra originated from Greek mythology as a multi-headed serpent-like creature. Much like it's namesake,
@@ -28,12 +35,12 @@ import { defineConfig } from "@rsbuild/core"
 import { hydra } from "@mpaynesecurity/hydra"
 
 export default defineConfig({
-	plugins: [
-		hydra({
-			apiDirectory: "sandbox/api",
-			routesFile: "sandbox/api-routes.gen.ts",
-		}),
-	]
+plugins: [
+    hydra({
+        apiDirectory: "sandbox/api",
+        routesFile: "sandbox/api-routes.gen.ts",
+    }),
+  ]
 })
 ```
 
@@ -45,7 +52,7 @@ export default defineConfig({
 import { Hono } from "hono"
 
 const app = new Hono().get("/", (c) => {
-	return c.json({message: "IT WORKED"})
+    return c.json({message: "IT WORKED"})
 })
 
 export default app
@@ -53,28 +60,7 @@ export default app
 
 ### Run the dev server
 
-#### NOTE: HMR does not work properly due to a known bug between Bun and the Rsbuild HMR websocket.
-
-```bash
-# HMR will not work
-bun --bun rsbuild dev
-```
-
-#### There are two workarounds:
-
-#### 1. Use the standard Node runtime instead.
-
-```bash
-rsbuild dev
-```
-
-#### 2. Upgrade Bun to the `canary` version
-
-```bash
-bun upgrade --canary
-```
-
-now you can run
+#### NOTE: HMR does not work properly due to a known bug between older versions of Bun (=< 1.4.0) and the Rsbuild HMR websocket.
 
 ```bash
 bun --bun rsbuild dev
@@ -93,7 +79,7 @@ bun --bun rsbuild build
 Preview the production build using the Bun runtime:
 
 ```bash
-bun --bun dist/index.mjs
+bun dist/index.mjs
 ```
 
 ## Preview using Cloudflare Wrangler
@@ -107,11 +93,11 @@ wrangler dev
 ## Caveats
 
 - Hydra is ESM only
-- As I am not in a financial position to use multiple cloud providers, production testing was achieved on Cloudflare via
-  Wrangler.
-- I work a very demanding day job which requires frequent travel. PRs and bug notices are welcome, but they may not be
+- Production testing was achieved on Cloudflare via Wrangler (I am not in a financial position to use multiple cloud providers),
+- I work a very demanding day job which requires frequent travel. PRs and bug foxes are welcome, but they may not be
   addressed right away.
 
 ## Thank You To
 
-- The Rstack team for producing such versatile, cohesive and powerful tools.
+- The [Rsbuild/Rspack](https://rsbuild.rs) team for producing such versatile, cohesive and powerful tools.
+- 

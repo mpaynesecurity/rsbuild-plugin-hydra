@@ -1,0 +1,12 @@
+{
+	"$schema": "https://unpkg.com",
+	"changelog": ["@changesets/changelog-github", { "repo": "@mpaynesecurity/rsbuild-plugin-hydra" }],
+	"commit": false,
+	"changedFilePatterns": ["./plugin/**", "./plugin/helpers", "./plugin/http"],
+	"fixed": [],
+	"linked": [],
+	"access": "public",
+	"baseBranch": "main",
+	"updateInternalDependencies": "patch",
+	"ignore": ["./plugin/**/dist", "./sandbox"]
+}
