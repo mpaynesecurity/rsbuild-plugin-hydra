@@ -2,6 +2,15 @@
 	"name": "@mpaynesecurity/rsbuild-plugin-hydra",
 	"version": "1.0.1",
 	"type": "module",
+	"keywords": [
+		"Hono",
+		"fullstack",
+		"file system routing"
+	],
+	"funding": {
+		"type": "ko-fi",
+		"url": "https://ko-fi.com/mpaynesecurity"
+	},
 	"scripts": {
 		"build:rsdoctor": "cross-env RSDOCTOR=true rslib",
 		"build": "NODE_ENV=development rslib",
@@ -15,13 +24,12 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^3.0.1",
+		"@changesets/changelog-github": "^1.0.1",
+		"@changesets/cli": "^3.0.2",
 		"@rsdoctor/rspack-plugin": "catalog:rstack",
 		"@rslib/core": "catalog:rstack",
-		"@types/bun": "catalog:types",
-		"@types/node": "catalog:types",
-		"cross-env": "catalog:",
-		"typescript": "catalog:"
+		"changesets": "^1.0.2",
+		"cross-env": "catalog:"
 	},
 	"peerDependencies": {
 		"@types/bun": "catalog:types",
@@ -29,7 +37,10 @@
 		"typescript": "catalog:"
 	},
 	"peerDependenciesMeta": {
-		"typescript": {
+		"@types/bun": {
+			"optional": false
+		},
+		"@types/node": {
 			"optional": false
 		}
 	},
@@ -38,7 +49,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/payneusmc07/rsbuild-plugin-hydra.git",
+		"url": "https://github.com/payneusmc07/rsbuild-plugin-hydra.git",
 		"directory": "plugin"
 	},
 	"exports": {
@@ -49,10 +60,6 @@
 		"./http": {
 			"types": "./dist/http/index.d.ts",
 			"import": "./dist/http/index.js"
-		},
-		"./env": {
-			"types": "./dist/env/index.d.ts",
-			"import": "./dist/env/index.js"
 		}
 	}
 }

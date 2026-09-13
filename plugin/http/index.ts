@@ -53,7 +53,7 @@ export interface RpcClientOptions {
 export const useRpcClient = <T extends Hono>(config: RpcClientOptions): RpcClient<T> => {
 	const pathPrefix = config.prefix
 	
-	/**
+	/*
 	 * Use the native URL API to clean up formatting automatically.
 	 * This handles missing protocols, trailing slashes, and edge cases
 	 */
@@ -75,36 +75,36 @@ export const useRpcClient = <T extends Hono>(config: RpcClientOptions): RpcClien
 
 
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.3
- *
  * The request has been received but not yet acted upon. It is non-committal, meaning that there is no way in HTTP to later send an asynchronous response indicating the outcome of processing the request. It is intended for cases where another process or server handles the request, or for batch processing.
+ *
+ * @see https://tools.ietf.org/html/rfc7231#section-6.3.3
  */
 export const ACCEPTED = 202
 
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.6.3
+ * The server, while acting as a gateway or proxy, received an invalid response from an inbound server it accessed while attempting to fulfill the request.
  *
- * This error response means that the server, while working as a gateway to get a response needed to handle the request, got an invalid response.
+ * @see https://tools.ietf.org/html/rfc7231#section-6.6.3
  */
 export const BAD_GATEWAY = 502
 
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.1
+ * Server could not understand the request due to invalid syntax.
  *
- * This response means that server could not understand the request due to invalid syntax.
+ * @see https://tools.ietf.org/html/rfc7231#section-6.5.1
  */
 export const BAD_REQUEST = 400
 
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.2
- *
  * The request has succeeded and a new resource has been created as a result of it. This is typically the response sent after a PUT request.
+ *
+ * @see https://tools.ietf.org/html/rfc7231#section-6.3.2
  */
 export const CREATED = 201
 
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.6.1
- *
  * The server encountered an unexpected condition that prevented it from fulfilling the request.
+ *
+ * @see https://tools.ietf.org/html/rfc7231#section-6.6.1
  */
 export const INTERNAL_SERVER_ERROR = 500

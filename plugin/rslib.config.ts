@@ -7,16 +7,14 @@ export default defineConfig({
 			format: "esm",
 			syntax: "esnext",
 			id: "rsbuild-plugin-hydra",
-			dts: {
-				isolated: true,
-			},
+			dts: true,
+			bundle: false,
+			outBase: "./"
 		},
 	],
 	output: {
 		autoExternal: true,
 		cleanDistPath: true,
-		// Do not bundle dev dependencies
-		externals: [...Object.keys(pkg.devDependencies)],
 		// Inlines legal notices; stops *.LICENSE.txt sidecars
 		legalComments: "inline",
 		module: true,
@@ -44,8 +42,8 @@ export default defineConfig({
 		entry: {
 			"index": "index.ts",
 			"serverEngine": "./serverEngine.ts",
-			"http/index": "./http/index.ts",
-			"env/index": "./env/index.ts",
+			"helpers/index": "helpers/index.ts",
+			"http/index": "./http/index.ts"
 		},
 	},
 	tools: {

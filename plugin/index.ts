@@ -1,9 +1,10 @@
-import type { RsbuildConfig, RsbuildPlugin } from "@rsbuild/core"
+import { type RsbuildConfig, type RsbuildPlugin, rspack } from "@rsbuild/core"
 import { Context } from "hono"
 import MagicString from "magic-string"
 import { existsSync } from "node:fs"
 import { mkdir, readFile } from "node:fs/promises"
 import { dirname, extname, relative, resolve } from "node:path"
+import { buildRoutesFile, generateUUID, normalizePath } from "./helpers"
 
 interface IHydraOptions {
 	/**
@@ -37,24 +38,6 @@ interface IHydraOptions {
 	routesFile: string
 }
 
-const normalizePath = (filePath: string): string => {
-	if(!filePath) {
-		return ""
-	}
-	
-	// Force all backslashes into forward slashes for URL compliance
-	let cleanPath = filePath.replace(/\\/g, "/")
-	
-	// Strip any leading relative indicators (./ or /) if they exist
-	if(cleanPath.startsWith("./")) {
-		cleanPath = cleanPath.slice(2)
-	}
-	else if(cleanPath.startsWith("/")) {
-		cleanPath = cleanPath.slice(1)
-	}
-	
-	return cleanPath
-}
 
 /**
  *
@@ -62,71 +45,15 @@ const normalizePath = (filePath: string): string => {
  * @returns {RsbuildPlugin}
  */
 export const hydra = (options: IHydraOptions): RsbuildPlugin => {
-	let isRouterFileWriting = false
-	
-	// --- 1. Generate Routes File ---
-	const buildRoutesFile = async () => {
-		if(isRouterFileWriting) {
-			return
-		}
-		isRouterFileWriting = true
-		
-		try {
-			const apiGlobber = new Bun.Glob("**/*.{ts,js}")
-			const apiFiles = apiGlobber.scan({cwd: options.apiDirectory})
-			
-			const codeLines = new MagicString("").append(`import { Hono } from "hono"\nexport const app = new Hono().basePath("/api")\n`)
-			
-			for await (const f of apiFiles) {
-				const randomApiFileId = Bun.hash(f).toString(36).slice(0, 8)
-				const importNamespace = `route_${randomApiFileId}`
-				
-				const absoluteTarget = resolve(options.apiDirectory, f)
-				
-				// Calculate relative path from the ROUTE FILE'S DIRECTORY, not the file itself
-				const routesFileDir = dirname(options.routesFile)
-				let relativePath = relative(routesFileDir, absoluteTarget).replace(/\\/g, "/")
-				
-				if(!relativePath.startsWith(".")) {
-					relativePath = `./${relativePath}`
-				}
-				
-				const extName = extname(relativePath)
-				if(extName) {
-					relativePath = relativePath.slice(0, -extName.length)
-				}
-				
-				// Remove the hardcoded ".ts" extension. Runtimes expect clean specifier modules.
-				codeLines.append(`\nimport * as ${importNamespace} from "${relativePath}"\n`)
-				
-				let urlPath = f.slice(0, -extname(f).length).replace(/\\/g, "/")
-				urlPath = urlPath.replace(/\[([^\]]+)\]/g, ":$1")
-				const cleanRoute = urlPath === "index" ? "/" : `/${urlPath}`
-				
-				codeLines.append(`if (${importNamespace} && typeof ${importNamespace}.default.fetch === "function") {\n`)
-				         .append(`\tapp.route("${cleanRoute}", ${importNamespace}.default)\n}\n`)
-			}
-			
-			if(!existsSync(options.apiDirectory)) {
-				await mkdir(options.apiDirectory, {recursive: true})
-			}
-			
-			// Overwrite this file every build loop so new routes write out dynamically.
-			await Bun.write(options.routesFile, codeLines.toString())
-		}
-		finally {
-			isRouterFileWriting = false
-		}
-	}
-	
 	return {
 		name: "rsbuild-plugin-hydra",
-		// Register the required compiler hooks
+		// Primary entry point
 		async setup(api) {
+			
 			// Generate the routes file before the production build is started
-			api.onBeforeBuild(async () => {
-				await buildRoutesFile()
-			})
+			api.onBeforeBuild(async () => await buildRoutesFile(options.apiDirectory, options.routesFile))
+			
+			/**/
 			api.modifyRsbuildConfig((config, {mergeRsbuildConfig}) => {
 				// Initialize the dev config object if it doesn't exist
 				config.dev ||= {}
@@ -152,10 +79,13 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 				return mergeRsbuildConfig(config, pluginConfig)
 			})
 			
-			// --- 2.3 DEVELOPMENT ---
+			/*
+			 This hook is called before the development server starts.
+			 We can utilize it to hook into the dev sever and use it to run our api routes.
+			 */
 			api.onBeforeStartDevServer(async ({server}) => {
 				// Generate the routes file before the dev server is started
-				await buildRoutesFile()
+				await buildRoutesFile(options.apiDirectory, options.routesFile)
 				/**
 				 * This middleware replaces `@hono/nodeserver` by converting Rsbuild/Node's Connect style middleware calls to web native apis.
 				 * Reduced overall plugin bundle size by ~50%
@@ -218,7 +148,6 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 						const webRequest = new Request(parsedUrlContext.href, {
 							method: req.method,
 							headers: webHeaders,
-							// Cast through any to satisfy TypeScript's strict BodyInit constraints
 							body: hasBody ? webBody : undefined,
 						})
 						
@@ -248,10 +177,11 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 					}
 				})
 			})
-			/**
-			 * This hook is called after the production build has finished (css, js and other assets).
-			 * We can utilize it for gathering the various binary assets/api routes and creating the production build
-			 * */
+			
+			/*
+			  This hook is called after the production build has finished (css, js and other assets).
+			  We can utilize it for gathering the various binary assets/api routes and creating the production build
+			 */
 			api.onAfterBuild(async () => {
 				const prodDistPath = api.context.distPath
 				
@@ -264,9 +194,12 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 				// Empty container for the production css and js
 				const assetEntries: string[] = []
 				
+				// Placeholder for `index.html`
 				let rootHtmlBase64 = ""
 				
+				
 				for await (const assetFile of assetsGlob) {
+					// Ignore index.mjs
 					if(assetFile === "index.mjs") {
 						continue
 					}
@@ -274,6 +207,7 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 					// Construct the absolute path to the assets directory and files
 					const absoluteAssetPath = resolve(prodDistPath, assetFile)
 					
+					// Bail out if we cannot find the assets path
 					if(!existsSync(absoluteAssetPath)) {
 						console.error("Asset missing path lookup")
 						process.exit(1)
@@ -301,8 +235,6 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 				
 				const distFilesGlob = new Bun.Glob("**/*.{ts,js}").scan({cwd: options.apiDirectory})
 				
-				const transpiler = new Bun.Transpiler({loader: "ts", allowBunRuntime: true})
-				
 				// Container for Hono imports
 				const msProductionImports = new MagicString("")
 				
@@ -312,41 +244,58 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 				// Container for normalized file paths
 				const msNormalizedFilePaths = new MagicString("")
 				
+				
+				// Read in each file in `distFilesGlob`
 				for await (const f of distFilesGlob) {
-					// Read in each file in `distFilesGlob`
 					const apiRoutes = await Bun.file(resolve(options.apiDirectory, f)).text()
 					
-					// Use Bun's native transpiler to convert `.ts` to `.js`
-					const transpiledApiRoutes = await transpiler.transform(apiRoutes)
-					
+					/**
+					 * Transpile `f` using Rspack/Rsbuild's native SWC.
+					 * Keeping the transpilation process within the Rust memory space
+					 * saves on context switching between
+					 * */
+					const transpiledApiRoutes = rspack.experiments.swc.transformSync(apiRoutes, {
+						filename: apiRoutes,
+						jsc: {
+							parser: {
+								syntax: "typescript"
+							},
+							target: "esnext",
+						},
+						module: {
+							type: "nodenext"
+						},
+						minify: true
+					})
+			
 					// Normalized each file's path
-					const normalizedFilePath = normalizePath(f)
+					const normalizedFilePath = normalizePath(transpiledApiRoutes.code)
 					
 					// Append the normalized file paths to the `msNormalizedFilePaths` container
 					msNormalizedFilePaths.append(normalizedFilePath)
 					
 					// Normalize the file path of each file in the glob and replace `.ts` with `.js`
-					const cleanFilePath = normalizePath(f).replace(/\.ts$/, ".js")
+					const cleanFilePath = normalizePath(f).replace(/\.ts$/, ".mjs")
 					
-					// Contruct the production output directory `dist/api-source/[filename].js`
+					// Contruct the production output directory `dist/api-source/[filename].mjs`
 					const outputTargetFile = resolve(prodDistPath, "api-source", cleanFilePath)
 					
 					// Create the output directory
 					await mkdir(dirname(outputTargetFile), {recursive: true})
 					
 					// Write the compiled api routes to the `api-source` directory
-					await Bun.write(outputTargetFile, transpiledApiRoutes)
+					await Bun.write(outputTargetFile, transpiledApiRoutes.code)
 					
 					// Create a slice of the file name starting from the 0 index
-					const routeUrlPath = normalizePath(f.slice(0, -extname(f).length)).replace(/\[([^\]]+)\]/g, ":$1")
+					const routeUrlPath = normalizePath(f.slice(0, -extname(f).length)).replace(/\[([^\]]+)]/g, ":$1")
 					
-					const cleanRoute = routeUrlPath === "index" ? "/" : `/${routeUrlPath}`
+					const cleanRoute = routeUrlPath === "index" ? "/" : `${routeUrlPath}`
 					
 					// Randomly generated id to append to each imported api route
-					const randomID = Bun.hash(f).toString(36).slice(0, 8)
+					const randomID = generateUUID(f)
 					
 					// Append the Hono imports to the `msProductionImports` container
-					msProductionImports.append(`\nimport * as m_${randomID} from "./api-source/${cleanFilePath}"\n`)
+					msProductionImports.append(`\nimport * as m_${randomID} from "./api-source/${cleanRoute}.mjs"\n`)
 					
 					// Append the api routes to the `msProductionRoutes` container
 					msProductionRoutes.append(`if (m_${randomID} && typeof m_${randomID}.default.fetch === "function") {\n`)
