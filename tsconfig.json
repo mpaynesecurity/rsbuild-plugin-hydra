@@ -19,7 +19,8 @@
 		"moduleResolution": "bundler",
 		"verbatimModuleSyntax": true,
 		"resolveJsonModule": true,
-		"allowImportingTsExtensions": true,
+		"noImplicitAny": true,
+		"resolvePackageJsonImports": true,
 		/* type checking */
 		"noUnusedLocals": false,
 		"isolatedModules": true,
@@ -28,7 +29,10 @@
 		"paths": {
 			"@/*": [
 				"./sandbox/*"
-			],
+			]
 		}
-	}
+	},
+	"exclude": [
+		"node_modules"
+	]
 }
