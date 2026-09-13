@@ -1,0 +1,31 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write      # MANDATORY: Allows the runner to create Git Tags and GitHub Releases
+  id-token: write      # MANDATORY: For npm/GPR package provenance signatures
+  packages: write      # REQUIRED: Allows publishing to GitHub Packages
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Changesets needs full git history to generate changelogs
+
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: bun changeset publish
+          createGithubReleases: true # FORCE: Automatically creates the official GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Maps the GPR registry authentication token
