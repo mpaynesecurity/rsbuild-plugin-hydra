@@ -27,12 +27,18 @@ export const navRoutes = [
 		path: "/",
 		label: "Home",
 		exact: true,
-		component: lazy(() => import("@/pages/index.tsx")),
+		component: lazy(() => import("@/pages/index")),
 	},
 	{
 		path: "/context",
 		label: "Context",
 		exact: true,
-		component: lazy(() => import("@/pages/context.tsx")),
+		component: lazy(() => import("@/pages/context")),
+	},
+	{
+		path: "/users",
+		label: "Users",
+		exact: true,
+		component: lazy(() => import("@/pages/users")),
 	},
 ] satisfies IRoute[]

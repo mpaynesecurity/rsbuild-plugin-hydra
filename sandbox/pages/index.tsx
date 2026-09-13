@@ -1,6 +1,6 @@
 import { Card } from "@/components"
 import { createResource, For, Show } from "solid-js"
-import { type AppType } from "@/api/os-info.ts"
+import { type AppType } from "@/api/os-info"
 import { useRpcClient } from "@mpaynesecurity/rsbuild-plugin-hydra/http"
 
 const client = useRpcClient<AppType>({
@@ -25,13 +25,13 @@ export default () => {
 			{/* Handle Solid's loading and error states natively */}
 			<Show when={!stats.loading} fallback={<p>Loading metrics...</p>}>
 				<Show when={!stats.error}>
-					<div class={"flex gap-5 mt-5 p-2 justify-between md:flex-col"}>
+					<div class="flex md:flex-col gap-6 p-4 items-center">
 						<Card
 							headerContent={
 								<h1 class={"text-cyan-50 mb-3 text-center"}><strong>Host Stats</strong></h1>
 							}
 							bodyContent={
-								<ul class="bg-dark">
+								<ul class="bg-dark ">
 									<li class={"text-cyan-50"}><strong>Host:</strong> {stats()?.hostName}</li>
 									<li class={"text-cyan-50"}><strong>Arch:</strong> {stats()?.cpuArch}</li>
 									<li class={"text-cyan-50"}><strong>Memory:</strong> {stats()?.totalMemory}</li>
@@ -40,12 +40,13 @@ export default () => {
 									<li class={"text-cyan-50"}><strong>Uptime:</strong> {stats()?.systemUptime} seconds</li>
 								</ul>
 							} />
+						{/* <Card bodyContent={}/> */}
 						<Card
 							bodyContent={
 								<div class="w-full text-cyan-50 bg-dark rounded-md border border-slate-800 overflow-hidden">
 									
 									{/* HEADER ROW - 4 locked columns, perfectly aligned and centered */}
-									<div class="grid grid-cols-4 gap-4 bg-slate-900 px-4 py-3 text-center font-bold border-b border-slate-800 text-sm tracking-wide">
+									<div class="grid grid-cols-4 gap-4 bg-slate-900 px-4 py-3 text-center font-bold border-b border-slate-800 text-sm">
 										<div>IP Family</div>
 										<div>IP Address</div>
 										<div>Mac Address</div>
@@ -69,7 +70,6 @@ export default () => {
 								</div>
 							}
 						/>
-					
 					</div>
 				</Show>
 			</Show>

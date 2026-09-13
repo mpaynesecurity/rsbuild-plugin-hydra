@@ -3,7 +3,6 @@ import { pluginBabel } from "@rsbuild/plugin-babel"
 import { pluginSolid } from "@rsbuild/plugin-solid"
 import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
 import { hydra } from "@mpaynesecurity/rsbuild-plugin-hydra"
-import { env } from "./validate-env"
 
 export default defineConfig({
 	plugins: [
@@ -52,7 +51,7 @@ export default defineConfig({
 		},
 	},
 	server: {
-		port: env.PORT,
+		port: parseInt(process.env.PORT!),
 		publicDir: false,
 	},
 })

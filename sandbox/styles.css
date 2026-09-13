@@ -23,7 +23,7 @@ body {
 }
 
 .card {
-    @apply rounded-xl  border border-gray-500/80 bg-dark p-3 shadow-md w-fit
+    @apply rounded-xl  border border-gray-500/80 bg-dark p-3 shadow-md
 }
 
 .label {

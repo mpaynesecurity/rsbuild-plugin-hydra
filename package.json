@@ -12,7 +12,7 @@
 		"sandbox:build:rsdoctor": "RSDOCTOR=true bun --bun rsbuild build",
 		"plugin:build": "bun run --elide-lines=0 --filter '*/rsbuild-plugin-hydra' build && bun i",
 		"plugin:build:rsdoctor": "bun run --elide-lines=0 --filter '*/rsbuild-plugin-hydra' build:rsdoctor",
-		"preview:build": "bun run plugin:build && bun run sandbox:build && bun run preview:bun",
+		"preview:build": "bun run plugin:build && bun run sandbox:build && bun run preview",
 		"preview": "bun dist/index.mjs",
 		"preview:cf": "wrangler dev"
 	},

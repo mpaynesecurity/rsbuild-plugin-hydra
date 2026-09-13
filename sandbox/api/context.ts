@@ -1,22 +1,25 @@
-import { Hono } from "hono"
-import { zValidator } from "@hono/zod-validator"
-import { string, object, optional } from "zod"
-import type { Ctx } from "../context"
+import type { Ctx } from "@/context"
+import { Context, Hono, type Next } from "hono"
+import { createMiddleware } from "hono/factory"
+import { validator } from "hono/validator"
 
-const querySchema = object({
-	message: optional(string()),
+
+const ctxMiddleware = createMiddleware<Ctx>(async (c: Context, next: Next) => {
+	c.set("message", "hi")
+	await next()
 })
 
+const app = new Hono()
+	.get("/", ctxMiddleware, (c) => c.text(c.var.message))
+	.post("/", validator("form", async (value, c) => {
+		const msg = value["message"]
+		if(!msg) {
+			return c.text("Missing field", 404)
+		}
+		console.log(msg)
+		return {msg}
+	}))
 
-const app = new Hono<Ctx>().get(
-	"/",
-	zValidator("query", querySchema), (c) => {
-		const query = c.req.valid("query")
-		
-		return c.json({
-			message: `${query?.message}`,
-		})
-	},
-)
 
+export type AppType = typeof app
 export default app

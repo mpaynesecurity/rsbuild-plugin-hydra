@@ -8,15 +8,15 @@ interface CardProps {
 
 export const Card = (props: CardProps) => {
 	return (
-		<div class={ "card" }>
-			<Show when={ props.headerContent }>
-				{ props.headerContent }
+		<div class={"card"}>
+			<Show when={props.headerContent}>
+				{props.headerContent}
 			</Show>
-			<div class={ "bg-card-body" }>
-				{ props.bodyContent }
+			<div>
+				{props.bodyContent}
 			</div>
-			<Show when={ props.footerContent }>
-				{ props.footerContent }
+			<Show when={props.footerContent}>
+				{props.footerContent}
 			</Show>
 		</div>
 	)
