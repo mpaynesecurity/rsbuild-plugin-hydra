@@ -4,6 +4,7 @@ import { pluginSolid } from "@rsbuild/plugin-solid"
 import { pluginTailwindcss } from "@rsbuild/plugin-tailwindcss"
 import { hydra } from "@mpaynesecurity/rsbuild-plugin-hydra"
 
+
 export default defineConfig({
 	plugins: [
 		pluginBabel({
