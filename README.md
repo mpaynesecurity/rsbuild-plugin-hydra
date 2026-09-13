@@ -9,7 +9,7 @@ Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app i
 
 ![https://ko-fi.com/s/c4e4fa35f8](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white&style=for-the-badge)
 
-## What's in the name?
+## What's in the name??
 
 The Hydra originated from Greek mythology as a multi-headed serpent-like creature. Much like it's namesake,
 Rsbuild-plugin-hydra has multiple heads, each one representing a Hono API route.
