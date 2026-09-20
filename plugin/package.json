@@ -1,10 +1,11 @@
 {
 	"name": "@mpaynesecurity/rsbuild-plugin-hydra",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"type": "module",
+	"license": "MIT",
 	"keywords": [
 		"Hono",
-		"fullstack",
+		"full stack",
 		"file system routing"
 	],
 	"funding": {
@@ -13,22 +14,20 @@
 	},
 	"scripts": {
 		"build:rsdoctor": "cross-env RSDOCTOR=true rslib",
-		"build": "NODE_ENV=development rslib",
+		"build": "cross-env NODE_ENV=development rslib",
 		"clean": "rm -rf node_modules",
-		"publish:staged": "npm stage publish",
-		"publish:git": "npm publish --registry=https://npm.pkg.github.com"
+		"publish:local": "npm publish --registry https://registry.mpaynesecurity.net",
+		"unpublish:local": "npm unpublish @mpaynesecurity/rsbuild-plugin-hydra --registry https://registry.mpaynesecurity.net --force",
+		"publish:git": "npm publish --registry https://npm.pkg.github.com --no-workspaces"
 	},
 	"dependencies": {
 		"hono": "catalog:hono",
-		"magic-string": "catalog:",
-		"zod": "catalog:"
+		"magic-string": "catalog:"
 	},
 	"devDependencies": {
-		"@changesets/changelog-github": "^1.0.1",
 		"@changesets/cli": "^3.0.2",
 		"@rsdoctor/rspack-plugin": "catalog:rstack",
 		"@rslib/core": "catalog:rstack",
-		"changesets": "^1.0.2",
 		"cross-env": "catalog:"
 	},
 	"peerDependencies": {
@@ -49,7 +48,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/payneusmc07/rsbuild-plugin-hydra.git",
+		"url": "https://github.com/mpaynesecurity/rsbuild-plugin-hydra.git",
 		"directory": "plugin"
 	},
 	"exports": {

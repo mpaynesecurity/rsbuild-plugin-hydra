@@ -41,7 +41,7 @@ export default defineConfig({
 	source: {
 		entry: {
 			"index": "index.ts",
-			"serverEngine": "./serverEngine.ts",
+			"templates/serverEngine": "./templates/serverEngine.ts",
 			"helpers/index": "helpers/index.ts",
 			"http/index": "./http/index.ts"
 		},

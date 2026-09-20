@@ -303,7 +303,7 @@ export const hydra = (options: IHydraOptions): RsbuildPlugin => {
 				}
 				
 				// Construct the path to the primary template file
-				const serverEngineTemplateFile = resolve(import.meta.dirname, "serverEngine.js")
+				const serverEngineTemplateFile = resolve(import.meta.dirname, "templates", "serverEngine.js")
 				
 				if(!existsSync(serverEngineTemplateFile)) {
 					console.error("Server Engine template file not found")

@@ -1,13 +1,22 @@
 # Introduction
 
-Rsbuild-plugin-hydra (Hydra for short) is a plugin which turns any Rsbuild app into a lightweight fullstack framework.
+### Turn any Rsbuild app into a lightweight fullstack framework.
 
-![NPM License](https://img.shields.io/npm/l/%40mpaynesecurity%2Frsbuild-plugin-hydra) 
-![npm package minimized gzipped size](https://img.shields.io/bundlejs/size/%40mpaynesecurity%2Frsbuild-plugin-hydra) 
+![NPM License](https://img.shields.io/npm/l/%40mpaynesecurity%2Frsbuild-plugin-hydra)
+![npm package minimized gzipped size](https://img.shields.io/bundlejs/size/%40mpaynesecurity%2Frsbuild-plugin-hydra)
 ![NPM Downloads](https://img.shields.io/npm/dm/%40mpaynesecurity%2Frsbuild-plugin-hydra)
 ![GitHub Sponsors](https://img.shields.io/github/sponsors/mpaynesecurity)
 
-![https://ko-fi.com/s/c4e4fa35f8](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white&style=for-the-badge)
+[Show your support on Ko-Fi](https://ko-fi.com/s/c4e4fa35f8])
+
+### Important Notes
+- Plugin is optimized for and will only work with the Bun runtime
+
+
+- Plugin is built on WinterCG-compliant web standards (Request, Response, and standard ES modules).
+  If your cloud provider or runtime does not support standard web primitives, that is a limitation of the provider, not
+  this tool.`
+
 
 ## What's in the name?
 
@@ -68,13 +77,12 @@ bun --bun rsbuild dev
 
 ## Production build
 
-Build the app for production:
 
 ```bash
 bun --bun rsbuild build
 ```
 
-## Preview using Bun runtime
+## Preview the build
 
 Preview the production build using the Bun runtime:
 
@@ -94,10 +102,10 @@ wrangler dev
 
 - Hydra is ESM only
 - Production testing was achieved on Cloudflare via Wrangler (I am not in a financial position to use multiple cloud providers),
-- I work a very demanding day job which requires frequent travel. PRs and bug foxes are welcome, but they may not be
+- I work a very demanding day job which requires frequent travel. PRs and bug fixes are welcome, but they may not be
   addressed right away.
 
-## Thank You To
+## Thank You
 
-- The [Rsbuild/Rspack](https://rsbuild.rs) team for producing such versatile, cohesive and powerful tools.
-- 
+- [Rsbuild/Rspack](https://rsbuild.rs)
+- [Bun/Anthropic](https://bun.sh)
